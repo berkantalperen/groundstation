@@ -26,7 +26,6 @@ namespace groundstation
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.None;
             timer1.Start();
-            serialPort.BaudRate = Convert.ToInt32(baudSelect.Text);
 
             chart1.Series.Add("Series1");
             chart1.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
@@ -151,6 +150,7 @@ namespace groundstation
             {
                 try
                 {
+                    serialPort.BaudRate = Convert.ToInt32(baudSelect.Text);
                     serialPort.PortName = portSelect.Text;
                     portOpenCloseWorker.RunWorkerAsync();
                 }
@@ -265,7 +265,6 @@ namespace groundstation
             //{
             //    applyToUI(data);
             //}));
-
         }
 
         //DOCUMENTS FILE LOCATION
@@ -278,7 +277,6 @@ namespace groundstation
                 fileText.Text = docsFilePath;
             }
         }
-
 
         //EXIT CONDITIONS
         private void exitBtn_Click(object sender, EventArgs e)
@@ -314,7 +312,7 @@ namespace groundstation
             }
             else
             {
-                DialogResult result2 = MessageBox.Show("You are already transferring a file! Do you want to cancel it?", "Error!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult result2 = MessageBox.Show("You are already transferring a file! Do you want to cancel it? ", "Error!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (result2 == DialogResult.Yes)
                 {
                     fileSenderWorker.CancelAsync();
@@ -323,6 +321,7 @@ namespace groundstation
                     {
                         foreach (string file in openFileDialog.FileNames)
                         {
+
                             fileSenderWorker.RunWorkerAsync(file);
                         }
                     }
@@ -333,9 +332,8 @@ namespace groundstation
         private void fileSenderWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             watch.Start();
-            long MAX_BUFFER = 1048576; //1MB 
-            long bytesRead = 0;
-            long totalBytesToWrite;
+            long MAX_BUFFER = 1048576 / 4; //250KB
+            long totalBytesWritten = 0;
             using (FileStream fs = File.Open(e.Argument.ToString(), FileMode.Open, FileAccess.Read))
             {
                 bool endLoop = false;
@@ -346,29 +344,26 @@ namespace groundstation
                         MAX_BUFFER = fs.Length;
                         endLoop = true;
                     }
-                    else if (bytesRead + MAX_BUFFER > fs.Length)
+                    else if (totalBytesWritten + MAX_BUFFER > fs.Length)
                     {
-                        MAX_BUFFER += bytesRead - fs.Length;
+                        MAX_BUFFER = fs.Length-totalBytesWritten;
                         endLoop = true;
                     }
                     byte[] buffer = new byte[MAX_BUFFER];
-                    bytesRead += fs.Read(buffer, 0, (int)MAX_BUFFER);
+                    fs.Read(buffer, 0, (int)MAX_BUFFER);
                     serialPort.Write(buffer, 0, buffer.Length);
-                    fileSenderWorker.ReportProgress((int)(bytesRead * 100 / fs.Length));
-                    totalBytesToWrite = serialPort.BytesToWrite;
-                    if (endLoop)
+                    while (serialPort.BytesToWrite != 0 && !fileSenderWorker.CancellationPending)
                     {
+                        long subTotal = totalBytesWritten + MAX_BUFFER - serialPort.BytesToWrite;
+                        decimal progressPercentage = Decimal.Multiply(subTotal, 1000000) / fs.Length;
+                        fileSenderWorker.ReportProgress((int)progressPercentage);
+                    }
+                    totalBytesWritten += MAX_BUFFER;
+                    if (endLoop | fileSenderWorker.CancellationPending)
+                    {
+                        e.Cancel = true;
                         break;
                     }
-                }
-                while (serialPort.BytesToWrite > 0)
-                {
-                    if (fileSenderWorker.CancellationPending)
-                    {
-                        break;
-                    }
-                    decimal progressPercentage = Decimal.Multiply(serialPort.BytesToWrite, 1000000) / totalBytesToWrite;
-                    fileSenderWorker.ReportProgress(1000000 - (int)progressPercentage);
                 }
             }
         }
@@ -380,9 +375,21 @@ namespace groundstation
         private void fileSenderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             watch.Stop();
-            MessageBox.Show($"File transfer completed in {watch.ElapsedMilliseconds}!");
-            serialProg.Value = 0;
-            serialProg.Update();
+            DialogResult result;
+            if (e.Cancelled)
+            {
+                result = MessageBox.Show($"File transfer cancelled at {watch.ElapsedMilliseconds}ms!");
+            }
+            else
+            {
+                result = MessageBox.Show($"File transfer completed in {watch.ElapsedMilliseconds}ms!");
+            }
+            if (result == DialogResult.OK)
+            {
+                serialProg.Value = 0;
+                serialProg.Update();
+            }
+            watch.Reset();
         }
         private void sendLineBtn_Click(object sender, EventArgs e)
         {
@@ -397,7 +404,6 @@ namespace groundstation
                 serialText.Text = "";
             }
         }
-
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (serialPort.IsOpen)
