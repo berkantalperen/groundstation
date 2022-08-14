@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea25 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea29 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea26 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea27 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea28 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea30 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea31 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea32 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.dataTableBox = new System.Windows.Forms.GroupBox();
@@ -90,8 +90,8 @@
             // 
             // chart1
             // 
-            chartArea25.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea25);
+            chartArea29.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea29);
             this.chart1.Location = new System.Drawing.Point(12, 30);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(482, 272);
@@ -248,8 +248,8 @@
             // 
             // chart3
             // 
-            chartArea26.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea26);
+            chartArea30.Name = "ChartArea1";
+            this.chart3.ChartAreas.Add(chartArea30);
             this.chart3.Location = new System.Drawing.Point(506, 314);
             this.chart3.Name = "chart3";
             this.chart3.Size = new System.Drawing.Size(482, 272);
@@ -258,8 +258,8 @@
             // 
             // chart4
             // 
-            chartArea27.Name = "ChartArea1";
-            this.chart4.ChartAreas.Add(chartArea27);
+            chartArea31.Name = "ChartArea1";
+            this.chart4.ChartAreas.Add(chartArea31);
             this.chart4.Location = new System.Drawing.Point(12, 314);
             this.chart4.Name = "chart4";
             this.chart4.Size = new System.Drawing.Size(482, 272);
@@ -268,8 +268,8 @@
             // 
             // chart2
             // 
-            chartArea28.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea28);
+            chartArea32.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea32);
             this.chart2.Location = new System.Drawing.Point(506, 30);
             this.chart2.Name = "chart2";
             this.chart2.Size = new System.Drawing.Size(482, 272);
@@ -376,9 +376,13 @@
             "19200",
             "38400",
             "57600",
-            "11520",
+            "115200",
             "128000",
-            "256000"});
+            "230400",
+            "250000",
+            "500000",
+            "1000000",
+            "2000000"});
             this.baudSelect.Location = new System.Drawing.Point(166, 30);
             this.baudSelect.Name = "baudSelect";
             this.baudSelect.Size = new System.Drawing.Size(142, 32);
