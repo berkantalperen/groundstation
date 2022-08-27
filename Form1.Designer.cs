@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea29 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea30 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea31 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea32 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.dataTableBox = new System.Windows.Forms.GroupBox();
@@ -67,6 +67,8 @@
             this.fileSenderWorker = new System.ComponentModel.BackgroundWorker();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.simBox = new System.Windows.Forms.GroupBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
@@ -90,8 +92,8 @@
             // 
             // chart1
             // 
-            chartArea29.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea29);
+            chartArea5.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea5);
             this.chart1.Location = new System.Drawing.Point(12, 30);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(482, 272);
@@ -115,6 +117,7 @@
             // 
             // treeView
             // 
+            this.treeView.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeView.Location = new System.Drawing.Point(12, 30);
             this.treeView.Name = "treeView";
             this.treeView.Size = new System.Drawing.Size(296, 556);
@@ -248,8 +251,8 @@
             // 
             // chart3
             // 
-            chartArea30.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea30);
+            chartArea6.Name = "ChartArea1";
+            this.chart3.ChartAreas.Add(chartArea6);
             this.chart3.Location = new System.Drawing.Point(506, 314);
             this.chart3.Name = "chart3";
             this.chart3.Size = new System.Drawing.Size(482, 272);
@@ -258,8 +261,8 @@
             // 
             // chart4
             // 
-            chartArea31.Name = "ChartArea1";
-            this.chart4.ChartAreas.Add(chartArea31);
+            chartArea7.Name = "ChartArea1";
+            this.chart4.ChartAreas.Add(chartArea7);
             this.chart4.Location = new System.Drawing.Point(12, 314);
             this.chart4.Name = "chart4";
             this.chart4.Size = new System.Drawing.Size(482, 272);
@@ -268,8 +271,8 @@
             // 
             // chart2
             // 
-            chartArea32.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea32);
+            chartArea8.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea8);
             this.chart2.Location = new System.Drawing.Point(506, 30);
             this.chart2.Name = "chart2";
             this.chart2.Size = new System.Drawing.Size(482, 272);
@@ -419,7 +422,7 @@
             this.fileBox.Size = new System.Drawing.Size(320, 74);
             this.fileBox.TabIndex = 4;
             this.fileBox.TabStop = false;
-            this.fileBox.Text = "File Location";
+            this.fileBox.Text = "Log File Location";
             // 
             // fileText
             // 
@@ -465,6 +468,8 @@
             // 
             // simBox
             // 
+            this.simBox.Controls.Add(this.button1);
+            this.simBox.Controls.Add(this.richTextBox1);
             this.simBox.Controls.Add(this.label2);
             this.simBox.Controls.Add(this.label1);
             this.simBox.Controls.Add(this.comboBox2);
@@ -477,6 +482,30 @@
             this.simBox.TabIndex = 12;
             this.simBox.TabStop = false;
             this.simBox.Text = "Data Simulation";
+            // 
+            // button1
+            // 
+            this.button1.BackColor = System.Drawing.Color.Transparent;
+            this.button1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button1.BackgroundImage")));
+            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.button1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button1.FlatAppearance.BorderSize = 0;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.Location = new System.Drawing.Point(270, 98);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(32, 32);
+            this.button1.TabIndex = 12;
+            this.button1.UseVisualStyleBackColor = false;
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(12, 99);
+            this.richTextBox1.Multiline = false;
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
+            this.richTextBox1.Size = new System.Drawing.Size(252, 32);
+            this.richTextBox1.TabIndex = 12;
+            this.richTextBox1.Text = "GCSDocs\\";
             // 
             // label2
             // 
@@ -530,7 +559,7 @@
             this.simBtn.Cursor = System.Windows.Forms.Cursors.Hand;
             this.simBtn.FlatAppearance.BorderSize = 0;
             this.simBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.simBtn.Location = new System.Drawing.Point(248, 52);
+            this.simBtn.Location = new System.Drawing.Point(232, 34);
             this.simBtn.Name = "simBtn";
             this.simBtn.Size = new System.Drawing.Size(48, 48);
             this.simBtn.TabIndex = 16;
@@ -632,6 +661,8 @@
         private System.ComponentModel.BackgroundWorker dataSimWorker;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }
 

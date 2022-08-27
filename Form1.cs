@@ -12,6 +12,8 @@ using System.IO;
 using System.IO.Ports;
 using System.Text.Json;
 using System.Reflection;
+using CsvHelper;
+using System.Globalization;
 
 namespace groundstation
 {
@@ -20,13 +22,19 @@ namespace groundstation
         public string[] availablePorts() { return SerialPort.GetPortNames().Length != 0 ? SerialPort.GetPortNames() : new[] { "No Ports Available!" }; }
         public string docsFilePath = "GCSDocs\\";
         public string logsFilePath = "adad";
+        public string simFilePath = "";
+
         public Form1()
         {
             InitializeComponent();
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.None;
             timer1.Start();
+            var simValue = new List<string>();
 
+            simValue.Add("cac");
+            simValue.Add("ad");
+            Console.WriteLine(simValue.Count);
             chart1.Series.Add("Series1");
             chart1.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
 
@@ -42,8 +50,6 @@ namespace groundstation
             {
                 chart1.Series["Series2"].Points.AddXY(i, i * i / 2);
             }
-
-            treeView.Nodes.Add("adadad\\adadadadaddada");
         }
 
         //CAMERA
@@ -165,8 +171,6 @@ namespace groundstation
             portSelect.Items.Clear();
             portSelect.Items.AddRange(availablePorts());
         }
-
-
         private void baudSelect_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (serialPort.IsOpen)
@@ -185,7 +189,6 @@ namespace groundstation
                 serialPort.Open();
             }
         }
-
         private void portOpenCloseWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error == null)
@@ -216,41 +219,89 @@ namespace groundstation
         }
         private void applyToUI(object data)
         {
-            //foreach (PropertyInfo propinfo in data.GetType().get.GetProperties())
-            //{
-            //    if (propinfo.Name == "Computer Name")
-            //    {
+            int comIndex = -2;
+            if (data.GetType().GetProperty("ComputerName") != null)
+            {
+                Console.WriteLine(data.GetType().GetProperty("ComputerName"));
+                if (treeView.Nodes.ContainsKey(data.GetType().GetProperty("ComputerName").GetValue(data).ToString()))
+                {
+                    comIndex = treeView.Nodes.IndexOfKey(data.GetType().GetProperty("ComputerName").GetValue(data).ToString());
+                }
+                else
+                {
+                    treeView.Nodes.Add(data.GetType().GetProperty("ComputerName").GetValue(data).ToString(), data.GetType().GetProperty("ComputerName").GetValue(data).ToString());
+                    comIndex = treeView.Nodes.IndexOfKey(data.GetType().GetProperty("ComputerName").GetValue(data).ToString());
+                }
+            }
+            else
+            {
+                MessageBox.Show("ComputerName value is not specified in data!","error");
+            }
 
-            //        //treeView.Nodes.Add(data.GetType().GetProperty(propinfo.Name));
-            //    }
-            //}
+            nodesFromObject(treeView.Nodes[comIndex], data);
+            treeView.ExpandAll();
         }
-
+        private void nodesFromObject(TreeNode treeNode, object data)
+        {
+            foreach (PropertyInfo propinfo in data.GetType().GetProperties())
+            {
+                if (propinfo.GetValue(data) != null & propinfo.Name != "ComputerName")
+                {
+                    if (treeNode.Nodes.ContainsKey(propinfo.Name))
+                    {
+                        if (!propinfo.GetValue(data).GetType().IsSerializable)
+                        {
+                            nodesFromObject(treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)], propinfo.GetValue(data));
+                        }
+                        else
+                        {
+                            treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)].Text = $"{propinfo.Name}: {propinfo.GetValue(data)}";
+                        }
+                    }
+                    else
+                    {
+                        if (!propinfo.GetValue(data).GetType().IsSerializable)
+                        {
+                            treeNode.Nodes.Add(propinfo.Name, propinfo.Name);
+                            nodesFromObject(treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)], propinfo.GetValue(data));
+                        }
+                        else
+                        {
+                            treeNode.Nodes.Add(propinfo.Name, $"{propinfo.Name}: {propinfo.GetValue(data)}");
+                        }
+                    }
+                }
+            }
+        }
         //DATA SIMULATION
         bool simIsOn = false;
         private void dataSimWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            int interval = Convert.ToInt32(intervalSelect.SelectedText);
-            stopwatch.Start();
-            simIsOn = !simIsOn;
+            //System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+            //int interval = Convert.ToInt32(intervalSelect.SelectedText);
+            //stopwatch.Start();
+            //simIsOn = !simIsOn;
 
-            while (simIsOn)
-            {
-                long time = (long)stopwatch.Elapsed.TotalSeconds;
-                dataFromCSV(time, "selected path");
-                Thread.Sleep(interval);
-            }
+            //while (simIsOn)
+            //{
+            //    long time = (long)stopwatch.Elapsed.TotalSeconds;
+            //    dataFromCSV(time, "selected path");
+            //    Thread.Sleep(interval);
+            //}
         }
-        private defaultDataset dataFromCSV(long time, string filepath)
+        private void dataFromCSV(long time, string filepath)
         {
             defaultDataset dataset = new defaultDataset("default");
             dataset.Time = time;
             dataset.Stage = time < 10 ? "Launch" : time < 180 ? "Burnout" : time < 240 ? "Apogee" : time < 300 ? "First recovery" : time < 360 ? "Second Recovery" : "Landed";
-            dataset.GPS[0] *= time / 10000;
-            dataset.GPS[1] *= time / 10000;
+            //dataset.GPS.Longitude *= time / 10000;
+            //dataset.GPS.Latitude *= time / 10000;
             dataset.Temperature = multiplyWithRandBtw(dataset.Temperature, 0.9, 1.1);
-            return dataset;
+            using (var reader = new StreamReader(filepath))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+
+            }
         }
         private double multiplyWithRandBtw(double variable, double minVal, double maxVal)
         {
@@ -295,7 +346,6 @@ namespace groundstation
                 videoSource.WaitForStop();
             }
         }
-
         //SEND FILE
         private void sendFileBtn_Click(object sender, EventArgs e)
         {
@@ -321,7 +371,6 @@ namespace groundstation
                     {
                         foreach (string file in openFileDialog.FileNames)
                         {
-
                             fileSenderWorker.RunWorkerAsync(file);
                         }
                     }
@@ -346,7 +395,7 @@ namespace groundstation
                     }
                     else if (totalBytesWritten + MAX_BUFFER > fs.Length)
                     {
-                        MAX_BUFFER = fs.Length-totalBytesWritten;
+                        MAX_BUFFER = fs.Length - totalBytesWritten;
                         endLoop = true;
                     }
                     byte[] buffer = new byte[MAX_BUFFER];
