@@ -37,6 +37,7 @@
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.dataTableBox = new System.Windows.Forms.GroupBox();
+            this.packetLabel = new System.Windows.Forms.Label();
             this.treeView = new System.Windows.Forms.TreeView();
             this.camPicture = new System.Windows.Forms.PictureBox();
             this.cameraBox = new System.Windows.Forms.GroupBox();
@@ -47,8 +48,8 @@
             this.pauseBtn = new System.Windows.Forms.Button();
             this.exitBtn = new System.Windows.Forms.Button();
             this.graphicsBox = new System.Windows.Forms.GroupBox();
-            this.chart3 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chart4 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chart3 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.serialBox = new System.Windows.Forms.GroupBox();
             this.sendLineBtn = new System.Windows.Forms.Button();
@@ -82,8 +83,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.camPicture)).BeginInit();
             this.cameraBox.SuspendLayout();
             this.graphicsBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
             this.serialBox.SuspendLayout();
             this.fileBox.SuspendLayout();
@@ -106,6 +107,7 @@
             // 
             // dataTableBox
             // 
+            this.dataTableBox.Controls.Add(this.packetLabel);
             this.dataTableBox.Controls.Add(this.treeView);
             this.dataTableBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataTableBox.Location = new System.Drawing.Point(36, 24);
@@ -115,12 +117,23 @@
             this.dataTableBox.TabStop = false;
             this.dataTableBox.Text = "Data Table";
             // 
+            // packetLabel
+            // 
+            this.packetLabel.AutoSize = true;
+            this.packetLabel.BackColor = System.Drawing.Color.White;
+            this.packetLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.packetLabel.Location = new System.Drawing.Point(13, 547);
+            this.packetLabel.Name = "packetLabel";
+            this.packetLabel.Size = new System.Drawing.Size(101, 13);
+            this.packetLabel.TabIndex = 1;
+            this.packetLabel.Text = "Packet count (S/F):";
+            // 
             // treeView
             // 
-            this.treeView.Font = new System.Drawing.Font("Microsoft Sans Serif", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.treeView.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.treeView.Location = new System.Drawing.Point(12, 30);
             this.treeView.Name = "treeView";
-            this.treeView.Size = new System.Drawing.Size(296, 556);
+            this.treeView.Size = new System.Drawing.Size(296, 533);
             this.treeView.TabIndex = 0;
             // 
             // camPicture
@@ -237,8 +250,8 @@
             // 
             // graphicsBox
             // 
-            this.graphicsBox.Controls.Add(this.chart3);
             this.graphicsBox.Controls.Add(this.chart4);
+            this.graphicsBox.Controls.Add(this.chart3);
             this.graphicsBox.Controls.Add(this.chart2);
             this.graphicsBox.Controls.Add(this.chart1);
             this.graphicsBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -249,25 +262,25 @@
             this.graphicsBox.TabStop = false;
             this.graphicsBox.Text = "Graphics";
             // 
-            // chart3
-            // 
-            chartArea6.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea6);
-            this.chart3.Location = new System.Drawing.Point(506, 314);
-            this.chart3.Name = "chart3";
-            this.chart3.Size = new System.Drawing.Size(482, 272);
-            this.chart3.TabIndex = 3;
-            this.chart3.Text = "chart3";
-            // 
             // chart4
             // 
-            chartArea7.Name = "ChartArea1";
-            this.chart4.ChartAreas.Add(chartArea7);
-            this.chart4.Location = new System.Drawing.Point(12, 314);
+            chartArea6.Name = "ChartArea1";
+            this.chart4.ChartAreas.Add(chartArea6);
+            this.chart4.Location = new System.Drawing.Point(506, 314);
             this.chart4.Name = "chart4";
             this.chart4.Size = new System.Drawing.Size(482, 272);
-            this.chart4.TabIndex = 2;
+            this.chart4.TabIndex = 3;
             this.chart4.Text = "chart4";
+            // 
+            // chart3
+            // 
+            chartArea7.Name = "ChartArea1";
+            this.chart3.ChartAreas.Add(chartArea7);
+            this.chart3.Location = new System.Drawing.Point(12, 314);
+            this.chart3.Name = "chart3";
+            this.chart3.Size = new System.Drawing.Size(482, 272);
+            this.chart3.TabIndex = 2;
+            this.chart3.Text = "chart3";
             // 
             // chart2
             // 
@@ -390,7 +403,7 @@
             this.baudSelect.Name = "baudSelect";
             this.baudSelect.Size = new System.Drawing.Size(142, 32);
             this.baudSelect.TabIndex = 1;
-            this.baudSelect.Text = "57600";
+            this.baudSelect.Text = "9600";
             this.baudSelect.SelectedIndexChanged += new System.EventHandler(this.baudSelect_SelectedIndexChanged);
             // 
             // serialBtn
@@ -602,11 +615,12 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.dataTableBox.ResumeLayout(false);
+            this.dataTableBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.camPicture)).EndInit();
             this.cameraBox.ResumeLayout(false);
             this.graphicsBox.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.chart3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
             this.serialBox.ResumeLayout(false);
             this.serialBox.PerformLayout();
@@ -633,8 +647,8 @@
         private System.Windows.Forms.Button exitBtn;
         private System.Windows.Forms.GroupBox graphicsBox;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart3;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart4;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart3;
         private System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.GroupBox serialBox;
         private System.Windows.Forms.ComboBox baudSelect;
@@ -663,6 +677,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Label packetLabel;
     }
 }
 

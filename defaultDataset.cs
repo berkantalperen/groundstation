@@ -34,15 +34,15 @@ namespace groundstation
         }
         public string ComputerName { get; set; }
         public long Time { get; set; }
-        public string Stage { get; set; }
-        public GPS GPS { get; set; }
+        public double Altitude { get; set; }
         public double Temperature { get; set; }
         public int Pressure { get; set; }
+        public int Humidity { get; set; }
         public double BatteryVoltage { get; set; }
+        public GPS GPS { get; set; }
         public Acceleration Acceleration { get; set; }
         public Gyro Gyro { get; set; }
-        public double Altitude { get; set; }
-        public int Humidity { get; set; }
+        public string Stage { get; set; }
     }
     public class GPS
     {

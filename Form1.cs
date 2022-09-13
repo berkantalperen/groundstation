@@ -23,33 +23,20 @@ namespace groundstation
         public string docsFilePath = "GCSDocs\\";
         public string logsFilePath = "adad";
         public string simFilePath = "";
-
+        public int successcount = 0, failcount = 0;
         public Form1()
         {
             InitializeComponent();
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.None;
             timer1.Start();
-            var simValue = new List<string>();
 
-            simValue.Add("cac");
-            simValue.Add("ad");
-            Console.WriteLine(simValue.Count);
-            chart1.Series.Add("Series1");
-            chart1.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            Console.WriteLine(SerialPort.GetPortNames()[0]);
 
-            for (int i = 0; i < 30000; i++)
-            {
-                chart1.Series["Series1"].Points.AddXY(i, i * i);
-            }
-            chart1.Series.Add("Series2");
-
-            chart1.Series["Series2"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-
-            for (int i = 0; i < 30000; i++)
-            {
-                chart1.Series["Series2"].Points.AddXY(i, i * i / 2);
-            }
+            //for (int i = 0; i < 30000; i++)
+            //{
+            //    chart1.Series["Series1"].Points.AddXY(i, i * i);
+            //}
         }
 
         //CAMERA
@@ -206,19 +193,57 @@ namespace groundstation
                 MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        string incomingdata = String.Empty;
+
+        System.Diagnostics.Stopwatch packetWatch = new System.Diagnostics.Stopwatch();
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (simIsOn == false)
+            //Console.WriteLine($"datareceived at {DateTime.Now.Millisecond}");
+            while (serialPort.BytesToRead > 0)
             {
-                BeginInvoke(new Action(() =>
+                char newbyte = (char)serialPort.ReadByte();
+                if (newbyte != '+')
                 {
-                    defaultDataset data = JsonSerializer.Deserialize<defaultDataset>(serialPort.ReadExisting());
-                    applyToUI(data);
-                }));
+                    incomingdata += newbyte;
+                    //Console.WriteLine($"{newbyte} is added to incomingdata={incomingdata}");
+                }
+                else
+                {
+                    try
+                    {
+                        defaultDataset data = JsonSerializer.Deserialize<defaultDataset>(incomingdata);
+                        BeginInvoke(new Action(() =>
+                        {
+                            applyToUI(data);
+
+                            packetLabel.Text = $"Packet count (S/F): {++successcount}/{failcount} ({packetWatch.ElapsedMilliseconds} ms)";
+                            if (packetWatch.IsRunning)
+                            {
+                                packetWatch.Restart();
+                            }
+                            else
+                            {
+                                packetWatch.Start();
+                            }
+                        }));
+
+                    }
+                    catch (Exception err)
+                    {
+                        BeginInvoke(new Action(() =>
+                        {
+                            packetLabel.Text = $"Packet count (S/F): {successcount}/{++failcount}";
+                        }));
+                    }
+                    Console.WriteLine($"sequence completed with datastring: {incomingdata}");
+                    incomingdata = String.Empty;
+                    serialPort.DiscardInBuffer();
+                }
             }
         }
         private void applyToUI(object data)
         {
+            Console.WriteLine("-");
             int comIndex = -2;
             if (data.GetType().GetProperty("ComputerName") != null)
             {
@@ -235,11 +260,35 @@ namespace groundstation
             }
             else
             {
-                MessageBox.Show("ComputerName value is not specified in data!","error");
+                MessageBox.Show("ComputerName value is not specified in data!", "error");
             }
-
             nodesFromObject(treeView.Nodes[comIndex], data);
             treeView.ExpandAll();
+
+            if (chart1.Series.IsUniqueName("Series1"))
+            {
+                chart1.Series.Add("Series1");
+                chart1.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            }
+            chart1.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1]?.GetValue(data), data.GetType().GetProperties()[2].GetValue(data));
+            if (chart2.Series.IsUniqueName("Series1"))
+            {
+                chart2.Series.Add("Series1");
+                chart2.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            }
+            chart2.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[3].GetValue(data));
+            if (chart4.Series.IsUniqueName("Series1"))
+            {
+                chart4.Series.Add("Series1");
+                chart4.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            }
+            chart4.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[4].GetValue(data));
+            if (chart3.Series.IsUniqueName("Series1"))
+            {
+                chart3.Series.Add("Series1");
+                chart3.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            }
+            chart3.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[5].GetValue(data));
         }
         private void nodesFromObject(TreeNode treeNode, object data)
         {
@@ -273,6 +322,7 @@ namespace groundstation
                 }
             }
         }
+
         //DATA SIMULATION
         bool simIsOn = false;
         private void dataSimWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -453,6 +503,7 @@ namespace groundstation
                 serialText.Text = "";
             }
         }
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             if (serialPort.IsOpen)
