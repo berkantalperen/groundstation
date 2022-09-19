@@ -21,6 +21,7 @@ namespace groundstation
     {
         public string[] availablePorts() { return SerialPort.GetPortNames().Length != 0 ? SerialPort.GetPortNames() : new[] { "No Ports Available!" }; }
         public string docsFilePath = "GCSDocs\\";
+        
         public string logsFilePath = "adad";
         public string simFilePath = "";
         public int successcount = 0, failcount = 0;
@@ -29,14 +30,6 @@ namespace groundstation
             InitializeComponent();
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.None;
-            timer1.Start();
-
-            Console.WriteLine(SerialPort.GetPortNames()[0]);
-
-            //for (int i = 0; i < 30000; i++)
-            //{
-            //    chart1.Series["Series1"].Points.AddXY(i, i * i);
-            //}
         }
 
         //CAMERA
@@ -196,12 +189,14 @@ namespace groundstation
         string incomingdata = String.Empty;
 
         System.Diagnostics.Stopwatch packetWatch = new System.Diagnostics.Stopwatch();
+        long totaldelay = 0, avg = 0;
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             //Console.WriteLine($"datareceived at {DateTime.Now.Millisecond}");
             while (serialPort.BytesToRead > 0)
             {
                 char newbyte = (char)serialPort.ReadByte();
+
                 if (newbyte != '+')
                 {
                     incomingdata += newbyte;
@@ -217,6 +212,9 @@ namespace groundstation
                             applyToUI(data);
 
                             packetLabel.Text = $"Packet count (S/F): {++successcount}/{failcount} ({packetWatch.ElapsedMilliseconds} ms)";
+                            totaldelay += packetWatch.ElapsedMilliseconds;
+                            avg = (totaldelay + packetWatch.ElapsedMilliseconds) / successcount;
+                            delayLabel.Text=$"Avg delay: {avg} ms";
                             if (packetWatch.IsRunning)
                             {
                                 packetWatch.Restart();
@@ -226,41 +224,38 @@ namespace groundstation
                                 packetWatch.Start();
                             }
                         }));
-
                     }
-                    catch (Exception err)
+                    catch (Exception)
                     {
                         BeginInvoke(new Action(() =>
                         {
                             packetLabel.Text = $"Packet count (S/F): {successcount}/{++failcount}";
                         }));
                     }
-                    Console.WriteLine($"sequence completed with datastring: {incomingdata}");
+                    //Console.WriteLine($"sequence completed with datastring: {incomingdata}");
                     incomingdata = String.Empty;
-                    serialPort.DiscardInBuffer();
+                    //serialPort.DiscardInBuffer();
                 }
             }
         }
         private void applyToUI(object data)
         {
-            Console.WriteLine("-");
             int comIndex = -2;
-            if (data.GetType().GetProperty("ComputerName") != null)
+            if (data.GetType().GetProperty("C") != null)
             {
-                Console.WriteLine(data.GetType().GetProperty("ComputerName"));
-                if (treeView.Nodes.ContainsKey(data.GetType().GetProperty("ComputerName").GetValue(data).ToString()))
+                if (treeView.Nodes.ContainsKey(data.GetType().GetProperty("C").GetValue(data).ToString()))
                 {
-                    comIndex = treeView.Nodes.IndexOfKey(data.GetType().GetProperty("ComputerName").GetValue(data).ToString());
+                    comIndex = treeView.Nodes.IndexOfKey(data.GetType().GetProperty("C").GetValue(data).ToString());
                 }
                 else
                 {
-                    treeView.Nodes.Add(data.GetType().GetProperty("ComputerName").GetValue(data).ToString(), data.GetType().GetProperty("ComputerName").GetValue(data).ToString());
-                    comIndex = treeView.Nodes.IndexOfKey(data.GetType().GetProperty("ComputerName").GetValue(data).ToString());
+                    treeView.Nodes.Add(data.GetType().GetProperty("C").GetValue(data).ToString(), data.GetType().GetProperty("C").GetValue(data).ToString());
+                    comIndex = treeView.Nodes.IndexOfKey(data.GetType().GetProperty("C").GetValue(data).ToString());
                 }
             }
             else
             {
-                MessageBox.Show("ComputerName value is not specified in data!", "error");
+                MessageBox.Show("C value is not specified in data!", "error");
             }
             nodesFromObject(treeView.Nodes[comIndex], data);
             treeView.ExpandAll();
@@ -270,7 +265,7 @@ namespace groundstation
                 chart1.Series.Add("Series1");
                 chart1.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
             }
-            chart1.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1]?.GetValue(data), data.GetType().GetProperties()[2].GetValue(data));
+            chart1.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[2].GetValue(data));
             if (chart2.Series.IsUniqueName("Series1"))
             {
                 chart2.Series.Add("Series1");
@@ -294,7 +289,7 @@ namespace groundstation
         {
             foreach (PropertyInfo propinfo in data.GetType().GetProperties())
             {
-                if (propinfo.GetValue(data) != null & propinfo.Name != "ComputerName")
+                if (propinfo.GetValue(data) != null & propinfo.Name != "C")
                 {
                     if (treeNode.Nodes.ContainsKey(propinfo.Name))
                     {
@@ -322,9 +317,20 @@ namespace groundstation
                 }
             }
         }
-
+        //TREEVIEW
+        private void clearTreeBtn_Click(object sender, EventArgs e)
+        {
+            treeView.Nodes.Clear();
+            totaldelay = 0;
+            avg = 0;
+            successcount = 0;
+            failcount = 0;
+            packetLabel.Text = $"Packet count (S/F): {successcount}/{failcount}";
+            delayLabel.Text = $"Avg delay: {avg} ms";
+            packetWatch.Reset();
+        }
         //DATA SIMULATION
-        bool simIsOn = false;
+        //bool simIsOn = false;
         private void dataSimWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             //System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
@@ -342,11 +348,11 @@ namespace groundstation
         private void dataFromCSV(long time, string filepath)
         {
             defaultDataset dataset = new defaultDataset("default");
-            dataset.Time = time;
-            dataset.Stage = time < 10 ? "Launch" : time < 180 ? "Burnout" : time < 240 ? "Apogee" : time < 300 ? "First recovery" : time < 360 ? "Second Recovery" : "Landed";
+            dataset.T = time;
+            dataset.S = time < 10 ? "Launch" : time < 180 ? "Burnout" : time < 240 ? "Apogee" : time < 300 ? "First recovery" : time < 360 ? "Second Recovery" : "Landed";
             //dataset.GPS.Longitude *= time / 10000;
             //dataset.GPS.Latitude *= time / 10000;
-            dataset.Temperature = multiplyWithRandBtw(dataset.Temperature, 0.9, 1.1);
+            dataset.Tmp = multiplyWithRandBtw(dataset.Tmp, 0.9, 1.1);
             using (var reader = new StreamReader(filepath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
@@ -427,10 +433,10 @@ namespace groundstation
                 }
             }
         }
-        System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch fileWatch = new System.Diagnostics.Stopwatch();
         private void fileSenderWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            watch.Start();
+            fileWatch.Start();
             long MAX_BUFFER = 1048576 / 4; //250KB
             long totalBytesWritten = 0;
             using (FileStream fs = File.Open(e.Argument.ToString(), FileMode.Open, FileAccess.Read))
@@ -473,22 +479,22 @@ namespace groundstation
         }
         private void fileSenderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            watch.Stop();
+            fileWatch.Stop();
             DialogResult result;
             if (e.Cancelled)
             {
-                result = MessageBox.Show($"File transfer cancelled at {watch.ElapsedMilliseconds}ms!");
+                result = MessageBox.Show($"File transfer cancelled at {fileWatch.ElapsedMilliseconds}ms!");
             }
             else
             {
-                result = MessageBox.Show($"File transfer completed in {watch.ElapsedMilliseconds}ms!");
+                result = MessageBox.Show($"File transfer completed in {fileWatch.ElapsedMilliseconds}ms!");
             }
             if (result == DialogResult.OK)
             {
                 serialProg.Value = 0;
                 serialProg.Update();
             }
-            watch.Reset();
+            fileWatch.Reset();
         }
         private void sendLineBtn_Click(object sender, EventArgs e)
         {
@@ -502,12 +508,6 @@ namespace groundstation
                 serialPort.WriteLine(serialText.Text);
                 serialText.Text = "";
             }
-        }
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            if (serialPort.IsOpen)
-                label3.Text = serialPort.BytesToWrite.ToString() + " " + serialPort.BaudRate + " " + fileSenderWorker.IsBusy + " " + fileSenderWorker.CancellationPending + " " + serialPort.WriteBufferSize;
         }
     }
 }

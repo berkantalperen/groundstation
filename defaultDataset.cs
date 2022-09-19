@@ -14,17 +14,17 @@ namespace groundstation
 
         public defaultDataset(string type)
         {
-            if (type == "default")
-            {
-                Temperature = 30;
-                Pressure = 101;
-                BatteryVoltage = 5;
-                Humidity = 46;
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
+            //if (type == "default")
+            //{
+            //    Tmp = 30;
+            //    P = 101;
+            //    B = 5;
+            //    H = 46;
+            //}
+            //else
+            //{
+            //    throw new ArgumentException();
+            //}
         }
         private double multiplyWithRandBtw(double variable, double minVal, double maxVal)
         {
@@ -32,22 +32,22 @@ namespace groundstation
             variable *= rand.NextDouble() * (maxVal - minVal) + minVal;
             return variable;
         }
-        public string ComputerName { get; set; }
-        public long Time { get; set; }
-        public double Altitude { get; set; }
-        public double Temperature { get; set; }
-        public int Pressure { get; set; }
-        public int Humidity { get; set; }
-        public double BatteryVoltage { get; set; }
+        public string C { get; set; }
+        public long T { get; set; }
+        public double A { get; set; }
+        public double Tmp { get; set; }
+        public int P { get; set; }
+        public int H { get; set; }
+        public double B { get; set; }
         public GPS GPS { get; set; }
-        public Acceleration Acceleration { get; set; }
+        public Acceleration Acc { get; set; }
         public Gyro Gyro { get; set; }
-        public string Stage { get; set; }
+        public string S { get; set; }
     }
     public class GPS
     {
-        public double Longitude { get; set; }
-        public double Latitude { get; set; }
+        public double Long { get; set; }
+        public double Lat { get; set; }
     }
     public class Acceleration
     {
