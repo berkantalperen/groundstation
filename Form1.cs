@@ -14,6 +14,10 @@ using System.Text.Json;
 using System.Reflection;
 using CsvHelper;
 using System.Globalization;
+using GMap.NET;
+using GMap.NET.MapProviders;
+using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms.Markers;
 
 namespace groundstation
 {
@@ -21,17 +25,49 @@ namespace groundstation
     {
         public string[] availablePorts() { return SerialPort.GetPortNames().Length != 0 ? SerialPort.GetPortNames() : new[] { "No Ports Available!" }; }
         public string docsFilePath = "GCSDocs\\";
-        
-        public string logsFilePath = "adad";
+        public string logsFilePath = "GCSDocs\\logs";
         public string simFilePath = "";
         public int successcount = 0, failcount = 0;
+        double[] ort_pos = {39.89009702352859,32.77991689326698};
+
         public Form1()
         {
             InitializeComponent();
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.None;
+
+            map.DragButton = MouseButtons.Left;
+            map.ShowCenter = false;
+            map.MapProvider = GoogleSatelliteMapProvider.Instance;
+            map.CacheLocation = "map_cache";
+            map.Position = new PointLatLng(ort_pos[0], ort_pos[1]);
+
         }
 
+        public void updateMarker(string markerId,double lat,double lon)
+        {
+            PointLatLng pos = new PointLatLng(lat, lon);
+            map.Position = pos;
+            GMapMarker marker = new GMarkerGoogle(pos, GMarkerGoogleType.red);
+
+            bool overlayExists = false;
+            foreach (GMapOverlay overlay in map.Overlays)
+            {
+                if (overlay.Id == $"{markerId}Overlay")
+                {
+                    overlay.Clear();
+                    overlayExists= true;
+                    overlay.Markers.Add(marker);
+                }
+            }
+            if (!overlayExists)
+            {
+                GMapOverlay markers = new GMapOverlay($"{markerId}Overlay");
+                markers.Markers.Add(marker);
+                map.Overlays.Add(markers);
+            }
+            map.Refresh();
+        }
         //CAMERA
         FilterInfoCollection videoDevices;
         VideoCaptureDevice videoSource;
@@ -111,6 +147,11 @@ namespace groundstation
         }
         private void recBtn_Click(object sender, EventArgs e)
         {
+            updateMarker("adada", multiplyWithRandBtw(ort_pos[0], 0.9999, 1.0001), multiplyWithRandBtw(ort_pos[1], 0.9999, 1.0001) );
+        }
+        private void button3_Click(object sender, EventArgs e)
+        {
+            updateMarker("bccbcbcbc", multiplyWithRandBtw(ort_pos[0], 0.9999, 1.0001), multiplyWithRandBtw(ort_pos[1], 0.9999, 1.0001));
         }
 
         //SERIAL PORT CONTROL
@@ -186,8 +227,8 @@ namespace groundstation
                 MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        string incomingdata = String.Empty;
 
+        string incomingdata = string.Empty;
         System.Diagnostics.Stopwatch packetWatch = new System.Diagnostics.Stopwatch();
         long totaldelay = 0, avg = 0;
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -214,7 +255,7 @@ namespace groundstation
                             packetLabel.Text = $"Packet count (S/F): {++successcount}/{failcount} ({packetWatch.ElapsedMilliseconds} ms)";
                             totaldelay += packetWatch.ElapsedMilliseconds;
                             avg = (totaldelay + packetWatch.ElapsedMilliseconds) / successcount;
-                            delayLabel.Text=$"Avg delay: {avg} ms";
+                            delayLabel.Text = $"Avg delay: {avg} ms";
                             if (packetWatch.IsRunning)
                             {
                                 packetWatch.Restart();
@@ -260,30 +301,40 @@ namespace groundstation
             nodesFromObject(treeView.Nodes[comIndex], data);
             treeView.ExpandAll();
 
-            if (chart1.Series.IsUniqueName("Series1"))
+            //if (chart1.Series.IsUniqueName("Series1"))
+            //{
+            //    chart1.Series.Add("Series1");
+            //    chart1.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            //}
+            //chart1.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[2].GetValue(data));
+        }
+        private void chartsFromObject(object data)
+        {
+            foreach (PropertyInfo propinfo in data.GetType().GetProperties())
             {
-                chart1.Series.Add("Series1");
-                chart1.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+                if (!propinfo.GetValue(data).GetType().IsSerializable)
+                {
+                    chartsFromObject(propinfo.GetValue(data));
+                }
+                else if (propinfo.GetValue(data) != null & IsDouble(propinfo.GetValue(data).ToString()))
+                {
+                    if (!flowLayoutPanel.Controls.ContainsKey($"{propinfo.Name}Chart"))
+                    {
+                        var newchart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+                        newchart.Margin = new System.Windows.Forms.Padding(0);
+                        newchart.Size = new System.Drawing.Size(480, 272);
+                        newchart.Name = $"{propinfo.Name}Chart";
+                        newchart.Text = $"{propinfo.Name}Chart";
+                        flowLayoutPanel.Controls.Add(newchart);
+                    }
+                    //flowLayoutPanel.Controls.fi
+                }
             }
-            chart1.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[2].GetValue(data));
-            if (chart2.Series.IsUniqueName("Series1"))
-            {
-                chart2.Series.Add("Series1");
-                chart2.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            }
-            chart2.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[3].GetValue(data));
-            if (chart4.Series.IsUniqueName("Series1"))
-            {
-                chart4.Series.Add("Series1");
-                chart4.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            }
-            chart4.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[4].GetValue(data));
-            if (chart3.Series.IsUniqueName("Series1"))
-            {
-                chart3.Series.Add("Series1");
-                chart3.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            }
-            chart3.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[5].GetValue(data));
+        }
+        private bool IsDouble(string input)
+        {
+            double num = 0.0;
+            return double.TryParse(input, out num);
         }
         private void nodesFromObject(TreeNode treeNode, object data)
         {
@@ -305,6 +356,7 @@ namespace groundstation
                     else
                     {
                         if (!propinfo.GetValue(data).GetType().IsSerializable)
+
                         {
                             treeNode.Nodes.Add(propinfo.Name, propinfo.Name);
                             nodesFromObject(treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)], propinfo.GetValue(data));
@@ -496,6 +548,8 @@ namespace groundstation
             }
             fileWatch.Reset();
         }
+
+
         private void sendLineBtn_Click(object sender, EventArgs e)
         {
             serialPort.Write(Encoding.ASCII.GetBytes(serialText.Text), 0, Encoding.ASCII.GetBytes(serialText.Text).Length);

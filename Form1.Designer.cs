@@ -30,9 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.dataTableBox = new System.Windows.Forms.GroupBox();
@@ -49,6 +46,8 @@
             this.pauseBtn = new System.Windows.Forms.Button();
             this.exitBtn = new System.Windows.Forms.Button();
             this.graphicsBox = new System.Windows.Forms.GroupBox();
+            this.flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.serialBox = new System.Windows.Forms.GroupBox();
             this.sendLineBtn = new System.Windows.Forms.Button();
             this.serialText = new System.Windows.Forms.RichTextBox();
@@ -75,21 +74,19 @@
             this.simBtn = new System.Windows.Forms.Button();
             this.dataSimWorker = new System.ComponentModel.BackgroundWorker();
             this.button2 = new System.Windows.Forms.Button();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart3 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart4 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.map = new GMap.NET.WindowsForms.GMapControl();
+            this.button3 = new System.Windows.Forms.Button();
             this.dataTableBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.camPicture)).BeginInit();
             this.cameraBox.SuspendLayout();
             this.graphicsBox.SuspendLayout();
+            this.flowLayoutPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.serialBox.SuspendLayout();
             this.fileBox.SuspendLayout();
             this.simBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart4)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // serialPort
@@ -168,6 +165,7 @@
             // 
             // cameraBox
             // 
+            this.cameraBox.Controls.Add(this.button3);
             this.cameraBox.Controls.Add(this.recBtn);
             this.cameraBox.Controls.Add(this.ssBtn);
             this.cameraBox.Controls.Add(this.playBtn);
@@ -271,10 +269,7 @@
             // 
             // graphicsBox
             // 
-            this.graphicsBox.Controls.Add(this.chart4);
-            this.graphicsBox.Controls.Add(this.chart3);
-            this.graphicsBox.Controls.Add(this.chart2);
-            this.graphicsBox.Controls.Add(this.chart1);
+            this.graphicsBox.Controls.Add(this.flowLayoutPanel);
             this.graphicsBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.graphicsBox.Location = new System.Drawing.Point(368, 24);
             this.graphicsBox.Name = "graphicsBox";
@@ -282,6 +277,27 @@
             this.graphicsBox.TabIndex = 10;
             this.graphicsBox.TabStop = false;
             this.graphicsBox.Text = "Graphics";
+            // 
+            // flowLayoutPanel
+            // 
+            this.flowLayoutPanel.AutoScroll = true;
+            this.flowLayoutPanel.Controls.Add(this.chart1);
+            this.flowLayoutPanel.Location = new System.Drawing.Point(12, 30);
+            this.flowLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.flowLayoutPanel.Name = "flowLayoutPanel";
+            this.flowLayoutPanel.Size = new System.Drawing.Size(977, 568);
+            this.flowLayoutPanel.TabIndex = 1;
+            // 
+            // chart1
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            this.chart1.Location = new System.Drawing.Point(0, 0);
+            this.chart1.Margin = new System.Windows.Forms.Padding(0);
+            this.chart1.Name = "chart1";
+            this.chart1.Size = new System.Drawing.Size(480, 272);
+            this.chart1.TabIndex = 0;
+            this.chart1.Text = "chart1";
             // 
             // serialBox
             // 
@@ -589,51 +605,65 @@
             this.button2.TabIndex = 13;
             this.button2.UseVisualStyleBackColor = false;
             // 
-            // chart1
+            // groupBox1
             // 
-            chartArea4.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea4);
-            this.chart1.Location = new System.Drawing.Point(12, 30);
-            this.chart1.Name = "chart1";
-            this.chart1.Size = new System.Drawing.Size(482, 272);
-            this.chart1.TabIndex = 0;
-            this.chart1.Text = "chart1";
+            this.groupBox1.Controls.Add(this.map);
+            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBox1.Location = new System.Drawing.Point(1380, 386);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(504, 342);
+            this.groupBox1.TabIndex = 10;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Location";
             // 
-            // chart3
+            // map
             // 
-            chartArea2.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea2);
-            this.chart3.Location = new System.Drawing.Point(12, 314);
-            this.chart3.Name = "chart3";
-            this.chart3.Size = new System.Drawing.Size(482, 272);
-            this.chart3.TabIndex = 2;
-            this.chart3.Text = "chart3";
+            this.map.Bearing = 0F;
+            this.map.CanDragMap = true;
+            this.map.EmptyTileColor = System.Drawing.Color.Navy;
+            this.map.GrayScaleMode = true;
+            this.map.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.map.LevelsKeepInMemory = 5;
+            this.map.Location = new System.Drawing.Point(12, 30);
+            this.map.Margin = new System.Windows.Forms.Padding(0);
+            this.map.MarkersEnabled = true;
+            this.map.MaxZoom = 20;
+            this.map.MinZoom = 10;
+            this.map.MouseWheelZoomEnabled = true;
+            this.map.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionWithoutCenter;
+            this.map.Name = "map";
+            this.map.NegativeMode = false;
+            this.map.PolygonsEnabled = false;
+            this.map.RetryLoadTile = 0;
+            this.map.RoutesEnabled = false;
+            this.map.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.map.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.map.ShowTileGridLines = false;
+            this.map.Size = new System.Drawing.Size(480, 300);
+            this.map.TabIndex = 1;
+            this.map.Zoom = 15D;
             // 
-            // chart2
+            // button3
             // 
-            chartArea3.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea3);
-            this.chart2.Location = new System.Drawing.Point(506, 30);
-            this.chart2.Name = "chart2";
-            this.chart2.Size = new System.Drawing.Size(482, 272);
-            this.chart2.TabIndex = 1;
-            this.chart2.Text = "chart2";
-            // 
-            // chart4
-            // 
-            chartArea1.Name = "ChartArea1";
-            this.chart4.ChartAreas.Add(chartArea1);
-            this.chart4.Location = new System.Drawing.Point(506, 314);
-            this.chart4.Name = "chart4";
-            this.chart4.Size = new System.Drawing.Size(482, 272);
-            this.chart4.TabIndex = 3;
-            this.chart4.Text = "chart4";
+            this.button3.BackColor = System.Drawing.Color.Transparent;
+            this.button3.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button3.BackgroundImage")));
+            this.button3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.button3.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button3.FlatAppearance.BorderSize = 0;
+            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button3.Location = new System.Drawing.Point(236, 162);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(32, 32);
+            this.button3.TabIndex = 10;
+            this.button3.UseVisualStyleBackColor = false;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1904, 1041);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.simBox);
             this.Controls.Add(this.fileBox);
@@ -650,15 +680,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.camPicture)).EndInit();
             this.cameraBox.ResumeLayout(false);
             this.graphicsBox.ResumeLayout(false);
+            this.flowLayoutPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.serialBox.ResumeLayout(false);
             this.serialBox.PerformLayout();
             this.fileBox.ResumeLayout(false);
             this.simBox.ResumeLayout(false);
             this.simBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart4)).EndInit();
+            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -705,10 +734,11 @@
         private System.Windows.Forms.Button clearTreeBtn;
         private System.Windows.Forms.Label delayLabel;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart4;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart3;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
+        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private GMap.NET.WindowsForms.GMapControl map;
+        private System.Windows.Forms.Button button3;
     }
 }
 
