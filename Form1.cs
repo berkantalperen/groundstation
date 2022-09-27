@@ -18,7 +18,7 @@ using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
-
+using System.Windows.Forms.DataVisualization.Charting;
 namespace groundstation
 {
     public partial class Form1 : Form
@@ -27,9 +27,12 @@ namespace groundstation
         public string docsFilePath = "GCSDocs\\";
         public string logsFilePath = "GCSDocs\\logs";
         public string simFilePath = "";
-        public int successcount = 0, failcount = 0;
-        double[] ort_pos = {39.89009702352859,32.77991689326698};
+        double[] ort_pos = { 39.89009702352859, 32.77991689326698 };
 
+        public string comPropName = "C";
+        public string gpsPropName = "GPS";
+        public string timePropName = "T";
+        public int successcount = 0, failcount = 0;
         public Form1()
         {
             InitializeComponent();
@@ -44,11 +47,11 @@ namespace groundstation
 
         }
 
-        public void updateMarker(string markerId,double lat,double lon)
+        public void updateMarker(string markerId, double lat, double lon)
         {
             PointLatLng pos = new PointLatLng(lat, lon);
             map.Position = pos;
-            GMapMarker marker = new GMarkerGoogle(pos, GMarkerGoogleType.red);
+            GMapMarker marker = markerId == "Container" ? new GMarkerGoogle(pos, (Bitmap)Image.FromFile("")) : markerId == "Probe" ? new GMarkerGoogle(pos, (Bitmap)Image.FromFile("")) : new GMarkerGoogle(pos, GMarkerGoogleType.red);
 
             bool overlayExists = false;
             foreach (GMapOverlay overlay in map.Overlays)
@@ -56,7 +59,7 @@ namespace groundstation
                 if (overlay.Id == $"{markerId}Overlay")
                 {
                     overlay.Clear();
-                    overlayExists= true;
+                    overlayExists = true;
                     overlay.Markers.Add(marker);
                 }
             }
@@ -66,7 +69,8 @@ namespace groundstation
                 markers.Markers.Add(marker);
                 map.Overlays.Add(markers);
             }
-            map.Refresh();
+            map.Zoom--;
+            map.Zoom++;
         }
         //CAMERA
         FilterInfoCollection videoDevices;
@@ -147,13 +151,8 @@ namespace groundstation
         }
         private void recBtn_Click(object sender, EventArgs e)
         {
-            updateMarker("adada", multiplyWithRandBtw(ort_pos[0], 0.9999, 1.0001), multiplyWithRandBtw(ort_pos[1], 0.9999, 1.0001) );
+            updateMarker("adada", multiplyWithRandBtw(ort_pos[0], 0.9999, 1.0001), multiplyWithRandBtw(ort_pos[1], 0.9999, 1.0001));
         }
-        private void button3_Click(object sender, EventArgs e)
-        {
-            updateMarker("bccbcbcbc", multiplyWithRandBtw(ort_pos[0], 0.9999, 1.0001), multiplyWithRandBtw(ort_pos[1], 0.9999, 1.0001));
-        }
-
         //SERIAL PORT CONTROL
         private void serialBtn_Click(object sender, EventArgs e)
         {
@@ -247,6 +246,7 @@ namespace groundstation
                 {
                     try
                     {
+
                         defaultDataset data = JsonSerializer.Deserialize<defaultDataset>(incomingdata);
                         BeginInvoke(new Action(() =>
                         {
@@ -281,93 +281,165 @@ namespace groundstation
         }
         private void applyToUI(object data)
         {
-            int comIndex = -2;
-            if (data.GetType().GetProperty("C") != null)
+            if (data.GetType().GetProperty(gpsPropName) != null && data.GetType().GetProperty(gpsPropName).GetValue(data) != null)
             {
-                if (treeView.Nodes.ContainsKey(data.GetType().GetProperty("C").GetValue(data).ToString()))
+                GPS pos = (GPS)data.GetType().GetProperty(gpsPropName).GetValue(data);
+                if (data.GetType().GetProperty(comPropName) != null && data.GetType().GetProperty(comPropName).GetValue(data) != null)
                 {
-                    comIndex = treeView.Nodes.IndexOfKey(data.GetType().GetProperty("C").GetValue(data).ToString());
+                    updateMarker((string)data.GetType().GetProperty(comPropName).GetValue(data), pos.Lat, pos.Lon);
                 }
                 else
                 {
-                    treeView.Nodes.Add(data.GetType().GetProperty("C").GetValue(data).ToString(), data.GetType().GetProperty("C").GetValue(data).ToString());
-                    comIndex = treeView.Nodes.IndexOfKey(data.GetType().GetProperty("C").GetValue(data).ToString());
+                    updateMarker("unknown", pos.Lat, pos.Lon);
                 }
+                noGPSLabel.Visible = false;
             }
             else
             {
-                MessageBox.Show("C value is not specified in data!", "error");
+                noGPSLabel.Visible = true;
             }
-            nodesFromObject(treeView.Nodes[comIndex], data);
+            nodesFromObject(null, data);
+            chartsFromObject(data);
             treeView.ExpandAll();
 
-            //if (chart1.Series.IsUniqueName("Series1"))
-            //{
-            //    chart1.Series.Add("Series1");
-            //    chart1.Series["Series1"].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            //}
-            //chart1.Series["Series1"].Points.AddXY(data.GetType().GetProperties()[1].GetValue(data), data.GetType().GetProperties()[2].GetValue(data));
+        }
+        private void nodesFromObject(TreeNode treeNode, object data)
+        {
+            // USE NULL PARAMETER FOR INITIAL CALL
+            foreach (PropertyInfo propinfo in data.GetType().GetProperties())
+            {
+                if (propinfo.GetValue(data) != null)
+                {
+                    if (treeNode == null)
+                    {
+                        int comIndex = -2;
+                        string s = propinfo.Name == comPropName ? $"{propinfo.GetValue(data)}" : "(Unknown ID)";
+                        if (!propinfo.GetValue(data).GetType().IsSerializable)
+                        {
+                            if (treeView.Nodes.ContainsKey(s))
+                            {
+                                comIndex = treeView.Nodes.IndexOfKey(s);
+                                nodesFromObject(treeView.Nodes[comIndex], propinfo.GetValue(data));
+                            }
+                            else
+                            {
+                                treeView.Nodes.Add(s, s);
+                                comIndex = treeView.Nodes.IndexOfKey(s);
+                                nodesFromObject(treeView.Nodes[comIndex], propinfo.GetValue(data));
+                            }
+                        }
+                        else
+                        {
+                            if (treeView.Nodes.ContainsKey(s))
+                            {
+                                comIndex = treeView.Nodes.IndexOfKey(s);
+                            }
+                            else
+                            {
+                                treeView.Nodes.Add(s, s);
+                                comIndex = treeView.Nodes.IndexOfKey(s);
+                            }
+                        }
+                        treeNode = treeView.Nodes[comIndex];
+                    }
+                    else
+                    {
+                        if (treeNode.Nodes.ContainsKey(propinfo.Name))
+                        {
+                            if (!propinfo.GetValue(data).GetType().IsSerializable)
+                            {
+                                nodesFromObject(treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)], propinfo.GetValue(data));
+                            }
+                            else
+                            {
+                                treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)].Text = $"{propinfo.Name}: {propinfo.GetValue(data)}";
+                            }
+                        }
+                        else
+                        {
+                            if (!propinfo.GetValue(data).GetType().IsSerializable)
+
+                            {
+                                treeNode.Nodes.Add(propinfo.Name, propinfo.Name);
+                                nodesFromObject(treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)], propinfo.GetValue(data));
+                            }
+                            else
+                            {
+                                treeNode.Nodes.Add(propinfo.Name, $"{propinfo.Name}: {propinfo.GetValue(data)}");
+                            }
+                        }
+                    }
+
+                }
+            }
         }
         private void chartsFromObject(object data)
         {
             foreach (PropertyInfo propinfo in data.GetType().GetProperties())
             {
-                if (!propinfo.GetValue(data).GetType().IsSerializable)
+                if (propinfo.GetValue(data) != null)
                 {
-                    chartsFromObject(propinfo.GetValue(data));
-                }
-                else if (propinfo.GetValue(data) != null & IsDouble(propinfo.GetValue(data).ToString()))
-                {
-                    if (!flowLayoutPanel.Controls.ContainsKey($"{propinfo.Name}Chart"))
+                    if (IsDouble(propinfo.GetValue(data).ToString()))
                     {
-                        var newchart = new System.Windows.Forms.DataVisualization.Charting.Chart();
-                        newchart.Margin = new System.Windows.Forms.Padding(0);
-                        newchart.Size = new System.Drawing.Size(480, 272);
-                        newchart.Name = $"{propinfo.Name}Chart";
-                        newchart.Text = $"{propinfo.Name}Chart";
-                        flowLayoutPanel.Controls.Add(newchart);
+                        if (!flowLayoutPanel.Controls.ContainsKey($"{propinfo.Name}Chart"))
+                        {
+                            addChart(propinfo.Name);
+                        }
+                        Chart relatedChart = (Chart)flowLayoutPanel.Controls.Find($"{propinfo.Name}Chart", false).First();
+
+                        string s = data.GetType().GetProperty(comPropName) != null && data.GetType().GetProperty(comPropName).GetValue(data) != null ? $"{data.GetType().GetProperty(comPropName).GetValue(data)}" : "UnknownID";
+                        if (relatedChart.Series.IsUniqueName(s))
+                        {
+                            relatedChart.Series.Add(s);
+                            relatedChart.Series[relatedChart.Series.IndexOf(s)].ChartType = SeriesChartType.Spline;
+                            relatedChart.Series[relatedChart.Series.IndexOf(s)].MarkerStyle = MarkerStyle.Diamond;
+                        }
+                        relatedChart.Series[relatedChart.Series.IndexOf(s)].Points.AddXY(DateTime.Now, propinfo.GetValue(data));
+
                     }
-                    //flowLayoutPanel.Controls.fi
+                    else if (!propinfo.GetValue(data).GetType().IsSerializable)
+                    {
+                        if (!flowLayoutPanel.Controls.ContainsKey($"{propinfo.Name}Chart"))
+                        {
+                            addChart(propinfo.Name);
+                        }
+                        Chart relatedChart = (Chart)flowLayoutPanel.Controls.Find($"{propinfo.Name}Chart", false).First();
+                        foreach (PropertyInfo propinfo2 in data.GetType().GetProperty(propinfo.Name).GetValue(data).GetType().GetProperties())
+                        {
+                            string s = data.GetType().GetProperty(comPropName) != null && data.GetType().GetProperty(comPropName).GetValue(data) != null ? $"{data.GetType().GetProperty(comPropName).GetValue(data)} ({propinfo2.Name})" : "UnknownID";
+                            if (relatedChart.Series.IsUniqueName(s))
+                            {
+                                relatedChart.Series.Add(s);
+                                relatedChart.Series[relatedChart.Series.IndexOf(s)].ChartType = SeriesChartType.Spline;
+                                relatedChart.Series[relatedChart.Series.IndexOf(s)].MarkerStyle = MarkerStyle.Diamond;
+
+                            }
+                            relatedChart.Series[relatedChart.Series.IndexOf(s)].Points.AddXY(DateTime.Now, propinfo.GetValue(data).GetType().GetProperty(propinfo2.Name).GetValue(propinfo.GetValue(data)));
+                        }
+                    }
                 }
             }
+        }
+        private void addChart(string name)
+        {
+            var newchart = new Chart();
+            ChartArea newChartArea = new ChartArea();
+            newchart.ChartAreas.Add(newChartArea);
+            newchart.Margin = new Padding(0);
+            newchart.Location = new Point(0, 0);
+            newchart.Size = new Size(479, 272);
+            newchart.Name = $"{name}Chart";
+            newchart.Text = $"{name}Chart";
+            newchart.Titles.Add(name);
+            Legend newlegend = new Legend();
+            newlegend.Docking = Docking.Bottom;
+            newchart.Legends.Add(newlegend);
+            flowLayoutPanel.Controls.Add(newchart);
         }
         private bool IsDouble(string input)
         {
             double num = 0.0;
             return double.TryParse(input, out num);
-        }
-        private void nodesFromObject(TreeNode treeNode, object data)
-        {
-            foreach (PropertyInfo propinfo in data.GetType().GetProperties())
-            {
-                if (propinfo.GetValue(data) != null & propinfo.Name != "C")
-                {
-                    if (treeNode.Nodes.ContainsKey(propinfo.Name))
-                    {
-                        if (!propinfo.GetValue(data).GetType().IsSerializable)
-                        {
-                            nodesFromObject(treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)], propinfo.GetValue(data));
-                        }
-                        else
-                        {
-                            treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)].Text = $"{propinfo.Name}: {propinfo.GetValue(data)}";
-                        }
-                    }
-                    else
-                    {
-                        if (!propinfo.GetValue(data).GetType().IsSerializable)
-
-                        {
-                            treeNode.Nodes.Add(propinfo.Name, propinfo.Name);
-                            nodesFromObject(treeNode.Nodes[treeNode.Nodes.IndexOfKey(propinfo.Name)], propinfo.GetValue(data));
-                        }
-                        else
-                        {
-                            treeNode.Nodes.Add(propinfo.Name, $"{propinfo.Name}: {propinfo.GetValue(data)}");
-                        }
-                    }
-                }
-            }
         }
         //TREEVIEW
         private void clearTreeBtn_Click(object sender, EventArgs e)
@@ -399,12 +471,12 @@ namespace groundstation
         }
         private void dataFromCSV(long time, string filepath)
         {
-            defaultDataset dataset = new defaultDataset("default");
+            defaultDataset dataset = new defaultDataset();
             dataset.T = time;
             dataset.S = time < 10 ? "Launch" : time < 180 ? "Burnout" : time < 240 ? "Apogee" : time < 300 ? "First recovery" : time < 360 ? "Second Recovery" : "Landed";
             //dataset.GPS.Longitude *= time / 10000;
             //dataset.GPS.Latitude *= time / 10000;
-            dataset.Tmp = multiplyWithRandBtw(dataset.Tmp, 0.9, 1.1);
+            //dataset.Tmp = multiplyWithRandBtw(dataset.Tmp, 0.9, 1.1);
             using (var reader = new StreamReader(filepath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
@@ -516,7 +588,7 @@ namespace groundstation
                         fileSenderWorker.ReportProgress((int)progressPercentage);
                     }
                     totalBytesWritten += MAX_BUFFER;
-                    if (endLoop | fileSenderWorker.CancellationPending)
+                    if (endLoop || fileSenderWorker.CancellationPending)
                     {
                         e.Cancel = true;
                         break;
