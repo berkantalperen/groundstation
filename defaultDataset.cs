@@ -23,6 +23,20 @@ namespace groundstation
         public Acceleration Acc { get; set; }
         public Gyro Gyro { get; set; }
         public string S { get; set; }
+        public defaultDataset(string c, long? t, double? a, double? tmp, int? p, int? h, double? b, GPS gPS, Acceleration acc, Gyro gyro, string s)
+        {
+            C = c;
+            T = t;
+            A = a;
+            Tmp = tmp;
+            P = p;
+            H = h;
+            B = b;
+            GPS = gPS;
+            Acc = acc;
+            Gyro = gyro;
+            S = s;
+        }
     }
     public class GPS
     {

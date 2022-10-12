@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using AForge.Video.DirectShow;
 using System.IO;
@@ -19,13 +16,24 @@ using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Collections.Generic;
+using System.Diagnostics;
+
 namespace groundstation
 {
     public partial class Form1 : Form
     {
         public string[] availablePorts() { return SerialPort.GetPortNames().Length != 0 ? SerialPort.GetPortNames() : new[] { "No Ports Available!" }; }
-        public string docsFilePath = "GCSDocs\\";
-        public string logsFilePath = "GCSDocs\\logs";
+        public string docsFilePath = "Docs";
+        public string logFileName = "undefined";
+        public string logFilePath()
+        {
+            if (!Directory.Exists(docsFilePath + "\\Logs"))
+            {
+                Directory.CreateDirectory(docsFilePath + "\\Logs");
+            }
+            return $"{docsFilePath}\\Logs\\{logFileName}.csv";
+        }
         public string simFilePath = "";
         double[] ort_pos = { 39.89009702352859, 32.77991689326698 };
 
@@ -39,12 +47,21 @@ namespace groundstation
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.None;
 
+            baudSelect.SelectedIndex = 3;
+            endingSelect.SelectedIndex = 1;
+
             map.DragButton = MouseButtons.Left;
             map.ShowCenter = false;
             map.MapProvider = GoogleSatelliteMapProvider.Instance;
             map.CacheLocation = "map_cache";
             map.Position = new PointLatLng(ort_pos[0], ort_pos[1]);
 
+            if (!Directory.Exists(docsFilePath))
+            {
+                Directory.CreateDirectory(docsFilePath);
+            }
+            docsItem.Text = $"Documents folder: \"{docsFilePath}\"";
+            newLogFile();
         }
 
         public void updateMarker(string markerId, double lat, double lon)
@@ -218,17 +235,162 @@ namespace groundstation
                 sendLineBtn.Enabled = !sendLineBtn.Enabled;
                 sendFileBtn.Enabled = !sendFileBtn.Enabled;
                 serialText.Enabled = !serialText.Enabled;
-                portLabel.Text = serialPort.IsOpen ? "Port Status: Open" : "Port Status: Closed";
-                portLabel.ForeColor = serialPort.IsOpen ? Color.LimeGreen : Color.Red;
+                serialBtn.ForeColor = serialPort.IsOpen ? Color.LimeGreen : Color.Red;
+                if (serialPort.IsOpen && logPortOpen.CheckState == CheckState.Checked)
+                {
+                    newLogFile();
+                }
             }
             else
             {
                 MessageBox.Show(e.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
+        private void serialText_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                sendLineBtn_Click(sender, e);
+                e.SuppressKeyPress = true;
+            }
+        }
+        private void serialBtn_MouseLeave(object sender, EventArgs e)
+        {
+            Cursor = Cursors.Default;
+        }
+        private void serialBtn_MouseMove(object sender, MouseEventArgs e)
+        {
+            Cursor = Cursors.Hand;
+        }
+        //SERIAL WRITE/TRANSFER
+        private void sendFileBtn_Click(object sender, EventArgs e)
+        {
+            if (!fileSenderWorker.IsBusy)
+            {
+                DialogResult result = openFileDialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    foreach (string file in openFileDialog.FileNames)
+                    {
+                        fileSenderWorker.RunWorkerAsync(file);
+                    }
+                }
+            }
+            else
+            {
+                DialogResult result2 = MessageBox.Show("You are already transferring a file! Do you want to cancel it? ", "Error!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result2 == DialogResult.Yes)
+                {
+                    fileSenderWorker.CancelAsync();
+                    DialogResult result = openFileDialog.ShowDialog();
+                    if (result == DialogResult.OK)
+                    {
+                        foreach (string file in openFileDialog.FileNames)
+                        {
+                            fileSenderWorker.RunWorkerAsync(file);
+                        }
+                    }
+                }
+            }
+        }
+        System.Diagnostics.Stopwatch fileWatch = new System.Diagnostics.Stopwatch();
+        private void fileSenderWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            fileWatch.Start();
+            long MAX_BUFFER = 1048576 / 4; //250KB
+            long totalBytesWritten = 0;
+            using (FileStream fs = File.Open(e.Argument.ToString(), FileMode.Open, FileAccess.Read))
+            {
+                bool endLoop = false;
+                while (true)
+                {
+                    if (fs.Length < MAX_BUFFER)
+                    {
+                        MAX_BUFFER = fs.Length;
+                        endLoop = true;
+                    }
+                    else if (totalBytesWritten + MAX_BUFFER > fs.Length)
+                    {
+                        MAX_BUFFER = fs.Length - totalBytesWritten;
+                        endLoop = true;
+                    }
+                    byte[] buffer = new byte[MAX_BUFFER];
+                    fs.Read(buffer, 0, (int)MAX_BUFFER);
+                    serialPort.Write(buffer, 0, buffer.Length);
+                    while (serialPort.BytesToWrite != 0 && !fileSenderWorker.CancellationPending)
+                    {
+                        long subTotal = totalBytesWritten + MAX_BUFFER - serialPort.BytesToWrite;
+                        decimal progressPercentage = Decimal.Multiply(subTotal, 1000000) / fs.Length;
+                        fileSenderWorker.ReportProgress((int)progressPercentage);
+                    }
+                    totalBytesWritten += MAX_BUFFER;
+                    if (endLoop)
+                    {
+                        break;
+                    }
+                    if (fileSenderWorker.CancellationPending)
+                    {
+                        Console.WriteLine("cancelled");
+                        e.Cancel = true;
+                        break;
+                    }
+                }
+            }
+        }
+        private void fileSenderWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            serialProg.Value = e.ProgressPercentage;
+        }
+        private void fileSenderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            fileWatch.Stop();
+            DialogResult result;
+            if (e.Cancelled)
+            {
+                result = MessageBox.Show($"File transfer cancelled at {fileWatch.ElapsedMilliseconds}ms!");
+            }
+            else
+            {
+                result = MessageBox.Show($"File transfer completed in {fileWatch.ElapsedMilliseconds}ms!");
+            }
+            if (result == DialogResult.OK)
+            {
+                serialProg.Value = 0;
+            }
+            fileWatch.Reset();
+        }
+        private void loggerWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            using (var writer = new StreamWriter(logFilePath(), true))
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                var records = new List<object>
+                {
+                    e.Argument
+                };
+                csv.WriteRecords(records);
+            }
+        }
+        private void sendLineBtn_Click(object sender, EventArgs e)
+        {
+            switch (endingSelect.SelectedIndex)
+            {
+                case 0:
+                    serialPort.Write(Encoding.ASCII.GetBytes(serialText.Text), 0, Encoding.ASCII.GetBytes(serialText.Text).Length);
+                    break;
+                case 1:
+                    serialPort.WriteLine(serialText.Text);
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+            }
+            serialText.Text = "";
+        }
+        //DATA HANDLING
         string incomingdata = string.Empty;
-        System.Diagnostics.Stopwatch packetWatch = new System.Diagnostics.Stopwatch();
+        Stopwatch packetWatch = new Stopwatch();
         long totaldelay = 0, avg = 0;
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
@@ -251,7 +413,6 @@ namespace groundstation
                         BeginInvoke(new Action(() =>
                         {
                             applyToUI(data);
-
                             packetLabel.Text = $"Packet count (S/F): {++successcount}/{failcount} ({packetWatch.ElapsedMilliseconds} ms)";
                             totaldelay += packetWatch.ElapsedMilliseconds;
                             avg = (totaldelay + packetWatch.ElapsedMilliseconds) / successcount;
@@ -265,6 +426,7 @@ namespace groundstation
                                 packetWatch.Start();
                             }
                         }));
+                        loggerWorker.RunWorkerAsync(data);
                     }
                     catch (Exception)
                     {
@@ -433,26 +595,17 @@ namespace groundstation
             newchart.Titles.Add(name);
             Legend newlegend = new Legend();
             newlegend.Docking = Docking.Bottom;
+
             newchart.Legends.Add(newlegend);
             flowLayoutPanel.Controls.Add(newchart);
         }
         private bool IsDouble(string input)
         {
-            double num = 0.0;
-            return double.TryParse(input, out num);
+            return double.TryParse(input, out _);
         }
-        //TREEVIEW
-        private void clearTreeBtn_Click(object sender, EventArgs e)
-        {
-            treeView.Nodes.Clear();
-            totaldelay = 0;
-            avg = 0;
-            successcount = 0;
-            failcount = 0;
-            packetLabel.Text = $"Packet count (S/F): {successcount}/{failcount}";
-            delayLabel.Text = $"Avg delay: {avg} ms";
-            packetWatch.Reset();
-        }
+
+
+
         //DATA SIMULATION
         //bool simIsOn = false;
         private void dataSimWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -498,15 +651,86 @@ namespace groundstation
             //}));
         }
 
-        //DOCUMENTS FILE LOCATION
-        private void fileBtn_Click(object sender, EventArgs e)
+        //FILE SETTINGS
+        private void docsNew_Click(object sender, EventArgs e)
         {
             DialogResult result = folderBrowserDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
                 docsFilePath = folderBrowserDialog.SelectedPath;
-                fileText.Text = docsFilePath;
+                docsItem.Text = $"Documents folder: \"{docsFilePath}\"";
             }
+        }
+        private void docsItem_Click(object sender, EventArgs e)
+        {
+            docsOpen_Click(sender,e);
+        }
+        private void docsOpen_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Process.Start(docsFilePath);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void docsCopy_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(docsFilePath);
+        }
+        private void newLogFile()
+        {
+            logFileName = DateTime.Now.ToString("ddMMyyyy_HHmmss");
+            logItem.Text = $"Log file name: \"{logFileName}.csv\"";
+        }
+        private void logNew_Click(object sender, EventArgs e)
+        {
+            newLogFile();
+        }
+        private void logOpen_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Process.Start(logFilePath());
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void logCopy_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(logFilePath());
+        }
+        //CLEAR ITEMS
+        private void clearAll_Click(object sender, EventArgs e)
+        {
+            clearTreeview_Click(sender, e);
+            clearCharts_Click(sender, e);
+            clearGPS_Click(sender, e);
+        }
+        private void clearTreeview_Click(object sender, EventArgs e)
+        {
+            treeView.Nodes.Clear();
+            totaldelay = 0;
+            avg = 0;
+            successcount = 0;
+            failcount = 0;
+            packetLabel.Text = $"Packet count (S/F): {successcount}/{failcount}";
+            delayLabel.Text = $"Avg delay: {avg} ms";
+            packetWatch.Reset();
+        }
+        private void clearCharts_Click(object sender, EventArgs e)
+        {
+            flowLayoutPanel.Controls.Clear();
+        }
+        private void clearGPS_Click(object sender, EventArgs e)
+        {
+            map.Overlays.Clear();
+            map.Zoom--;
+            map.Zoom++;
         }
 
         //EXIT CONDITIONS
@@ -524,115 +748,6 @@ namespace groundstation
             {
                 videoSource.SignalToStop();
                 videoSource.WaitForStop();
-            }
-        }
-        //SEND FILE
-        private void sendFileBtn_Click(object sender, EventArgs e)
-        {
-            if (!fileSenderWorker.IsBusy)
-            {
-                DialogResult result = openFileDialog.ShowDialog();
-                if (result == DialogResult.OK)
-                {
-                    foreach (string file in openFileDialog.FileNames)
-                    {
-                        fileSenderWorker.RunWorkerAsync(file);
-                    }
-                }
-            }
-            else
-            {
-                DialogResult result2 = MessageBox.Show("You are already transferring a file! Do you want to cancel it? ", "Error!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (result2 == DialogResult.Yes)
-                {
-                    fileSenderWorker.CancelAsync();
-                    DialogResult result = openFileDialog.ShowDialog();
-                    if (result == DialogResult.OK)
-                    {
-                        foreach (string file in openFileDialog.FileNames)
-                        {
-                            fileSenderWorker.RunWorkerAsync(file);
-                        }
-                    }
-                }
-            }
-        }
-        System.Diagnostics.Stopwatch fileWatch = new System.Diagnostics.Stopwatch();
-        private void fileSenderWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            fileWatch.Start();
-            long MAX_BUFFER = 1048576 / 4; //250KB
-            long totalBytesWritten = 0;
-            using (FileStream fs = File.Open(e.Argument.ToString(), FileMode.Open, FileAccess.Read))
-            {
-                bool endLoop = false;
-                while (true)
-                {
-                    if (fs.Length < MAX_BUFFER)
-                    {
-                        MAX_BUFFER = fs.Length;
-                        endLoop = true;
-                    }
-                    else if (totalBytesWritten + MAX_BUFFER > fs.Length)
-                    {
-                        MAX_BUFFER = fs.Length - totalBytesWritten;
-                        endLoop = true;
-                    }
-                    byte[] buffer = new byte[MAX_BUFFER];
-                    fs.Read(buffer, 0, (int)MAX_BUFFER);
-                    serialPort.Write(buffer, 0, buffer.Length);
-                    while (serialPort.BytesToWrite != 0 && !fileSenderWorker.CancellationPending)
-                    {
-                        long subTotal = totalBytesWritten + MAX_BUFFER - serialPort.BytesToWrite;
-                        decimal progressPercentage = Decimal.Multiply(subTotal, 1000000) / fs.Length;
-                        fileSenderWorker.ReportProgress((int)progressPercentage);
-                    }
-                    totalBytesWritten += MAX_BUFFER;
-                    if (endLoop || fileSenderWorker.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        break;
-                    }
-                }
-            }
-        }
-        private void fileSenderWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            serialProg.Value = e.ProgressPercentage;
-            serialProg.Update();
-        }
-        private void fileSenderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            fileWatch.Stop();
-            DialogResult result;
-            if (e.Cancelled)
-            {
-                result = MessageBox.Show($"File transfer cancelled at {fileWatch.ElapsedMilliseconds}ms!");
-            }
-            else
-            {
-                result = MessageBox.Show($"File transfer completed in {fileWatch.ElapsedMilliseconds}ms!");
-            }
-            if (result == DialogResult.OK)
-            {
-                serialProg.Value = 0;
-                serialProg.Update();
-            }
-            fileWatch.Reset();
-        }
-
-
-        private void sendLineBtn_Click(object sender, EventArgs e)
-        {
-            serialPort.Write(Encoding.ASCII.GetBytes(serialText.Text), 0, Encoding.ASCII.GetBytes(serialText.Text).Length);
-            serialText.Text = "";
-        }
-        private void serialText_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar == (char)Keys.Enter)
-            {
-                serialPort.WriteLine(serialText.Text);
-                serialText.Text = "";
             }
         }
     }

@@ -33,7 +33,6 @@
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.dataTableBox = new System.Windows.Forms.GroupBox();
             this.delayLabel = new System.Windows.Forms.Label();
-            this.clearTreeBtn = new System.Windows.Forms.Button();
             this.packetLabel = new System.Windows.Forms.Label();
             this.treeView = new System.Windows.Forms.TreeView();
             this.camPicture = new System.Windows.Forms.PictureBox();
@@ -43,22 +42,9 @@
             this.playBtn = new System.Windows.Forms.Button();
             this.camSelect = new System.Windows.Forms.ComboBox();
             this.pauseBtn = new System.Windows.Forms.Button();
-            this.exitBtn = new System.Windows.Forms.Button();
             this.graphicsBox = new System.Windows.Forms.GroupBox();
             this.flowLayoutPanel = new System.Windows.Forms.FlowLayoutPanel();
-            this.serialBox = new System.Windows.Forms.GroupBox();
-            this.sendLineBtn = new System.Windows.Forms.Button();
-            this.serialText = new System.Windows.Forms.RichTextBox();
-            this.sendFileBtn = new System.Windows.Forms.Button();
-            this.serialProg = new System.Windows.Forms.ProgressBar();
-            this.portLabel = new System.Windows.Forms.Label();
-            this.portSelect = new System.Windows.Forms.ComboBox();
-            this.baudSelect = new System.Windows.Forms.ComboBox();
-            this.serialBtn = new System.Windows.Forms.Button();
             this.portOpenCloseWorker = new System.ComponentModel.BackgroundWorker();
-            this.fileBox = new System.Windows.Forms.GroupBox();
-            this.fileText = new System.Windows.Forms.RichTextBox();
-            this.fileBtn = new System.Windows.Forms.Button();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.fileSenderWorker = new System.ComponentModel.BackgroundWorker();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -71,19 +57,44 @@
             this.intervalSelect = new System.Windows.Forms.ComboBox();
             this.simBtn = new System.Windows.Forms.Button();
             this.dataSimWorker = new System.ComponentModel.BackgroundWorker();
-            this.button2 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.noGPSLabel = new System.Windows.Forms.Label();
             this.map = new GMap.NET.WindowsForms.GMapControl();
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.loggerWorker = new System.ComponentModel.BackgroundWorker();
+            this.toolStrip = new System.Windows.Forms.ToolStrip();
+            this.portSelect = new System.Windows.Forms.ToolStripComboBox();
+            this.baudSelect = new System.Windows.Forms.ToolStripComboBox();
+            this.serialBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.serialText = new System.Windows.Forms.ToolStripTextBox();
+            this.sendLineBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.endingSelect = new System.Windows.Forms.ToolStripComboBox();
+            this.sendFileBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.serialProg = new System.Windows.Forms.ToolStripProgressBar();
+            this.exitBtn = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.docsItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.docsNew = new System.Windows.Forms.ToolStripMenuItem();
+            this.docsCopy = new System.Windows.Forms.ToolStripMenuItem();
+            this.docsOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.logItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.logNew = new System.Windows.Forms.ToolStripMenuItem();
+            this.logPortOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.logCopy = new System.Windows.Forms.ToolStripMenuItem();
+            this.logOpen = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.clearItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.clearTreeview = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearCharts = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearGPS = new System.Windows.Forms.ToolStripMenuItem();
             this.dataTableBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.camPicture)).BeginInit();
             this.cameraBox.SuspendLayout();
             this.graphicsBox.SuspendLayout();
-            this.serialBox.SuspendLayout();
-            this.fileBox.SuspendLayout();
             this.simBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.toolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // serialPort
@@ -93,7 +104,6 @@
             // dataTableBox
             // 
             this.dataTableBox.Controls.Add(this.delayLabel);
-            this.dataTableBox.Controls.Add(this.clearTreeBtn);
             this.dataTableBox.Controls.Add(this.packetLabel);
             this.dataTableBox.Controls.Add(this.treeView);
             this.dataTableBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -116,21 +126,6 @@
             this.delayLabel.Size = new System.Drawing.Size(91, 13);
             this.delayLabel.TabIndex = 17;
             this.delayLabel.Text = "Avg delay (ms):    ";
-            // 
-            // clearTreeBtn
-            // 
-            this.clearTreeBtn.BackColor = System.Drawing.Color.White;
-            this.clearTreeBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("clearTreeBtn.BackgroundImage")));
-            this.clearTreeBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.clearTreeBtn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.clearTreeBtn.FlatAppearance.BorderSize = 0;
-            this.clearTreeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.clearTreeBtn.Location = new System.Drawing.Point(274, 32);
-            this.clearTreeBtn.Name = "clearTreeBtn";
-            this.clearTreeBtn.Size = new System.Drawing.Size(32, 32);
-            this.clearTreeBtn.TabIndex = 16;
-            this.clearTreeBtn.UseVisualStyleBackColor = false;
-            this.clearTreeBtn.Click += new System.EventHandler(this.clearTreeBtn_Click);
             // 
             // packetLabel
             // 
@@ -248,21 +243,6 @@
             this.pauseBtn.UseVisualStyleBackColor = false;
             this.pauseBtn.Click += new System.EventHandler(this.pauseBtn_Click);
             // 
-            // exitBtn
-            // 
-            this.exitBtn.BackColor = System.Drawing.Color.Transparent;
-            this.exitBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("exitBtn.BackgroundImage")));
-            this.exitBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.exitBtn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.exitBtn.FlatAppearance.BorderSize = 0;
-            this.exitBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.exitBtn.Location = new System.Drawing.Point(1870, 1030);
-            this.exitBtn.Name = "exitBtn";
-            this.exitBtn.Size = new System.Drawing.Size(50, 50);
-            this.exitBtn.TabIndex = 10;
-            this.exitBtn.UseVisualStyleBackColor = false;
-            this.exitBtn.Click += new System.EventHandler(this.exitBtn_Click);
-            // 
             // graphicsBox
             // 
             this.graphicsBox.Controls.Add(this.flowLayoutPanel);
@@ -283,175 +263,12 @@
             this.flowLayoutPanel.Size = new System.Drawing.Size(976, 556);
             this.flowLayoutPanel.TabIndex = 1;
             // 
-            // serialBox
-            // 
-            this.serialBox.Controls.Add(this.sendLineBtn);
-            this.serialBox.Controls.Add(this.serialText);
-            this.serialBox.Controls.Add(this.sendFileBtn);
-            this.serialBox.Controls.Add(this.serialProg);
-            this.serialBox.Controls.Add(this.portLabel);
-            this.serialBox.Controls.Add(this.portSelect);
-            this.serialBox.Controls.Add(this.baudSelect);
-            this.serialBox.Controls.Add(this.serialBtn);
-            this.serialBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.serialBox.Location = new System.Drawing.Point(36, 628);
-            this.serialBox.Name = "serialBox";
-            this.serialBox.Size = new System.Drawing.Size(320, 202);
-            this.serialBox.TabIndex = 2;
-            this.serialBox.TabStop = false;
-            this.serialBox.Text = "Serial Communication Control";
-            // 
-            // sendLineBtn
-            // 
-            this.sendLineBtn.BackColor = System.Drawing.Color.Transparent;
-            this.sendLineBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("sendLineBtn.BackgroundImage")));
-            this.sendLineBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.sendLineBtn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.sendLineBtn.Enabled = false;
-            this.sendLineBtn.FlatAppearance.BorderSize = 0;
-            this.sendLineBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.sendLineBtn.Location = new System.Drawing.Point(232, 135);
-            this.sendLineBtn.Name = "sendLineBtn";
-            this.sendLineBtn.Size = new System.Drawing.Size(32, 32);
-            this.sendLineBtn.TabIndex = 15;
-            this.sendLineBtn.UseVisualStyleBackColor = false;
-            this.sendLineBtn.Click += new System.EventHandler(this.sendLineBtn_Click);
-            // 
-            // serialText
-            // 
-            this.serialText.Enabled = false;
-            this.serialText.Location = new System.Drawing.Point(12, 136);
-            this.serialText.Name = "serialText";
-            this.serialText.Size = new System.Drawing.Size(208, 32);
-            this.serialText.TabIndex = 14;
-            this.serialText.Text = "";
-            this.serialText.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.serialText_KeyPress);
-            // 
-            // sendFileBtn
-            // 
-            this.sendFileBtn.BackColor = System.Drawing.Color.Transparent;
-            this.sendFileBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("sendFileBtn.BackgroundImage")));
-            this.sendFileBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.sendFileBtn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.sendFileBtn.Enabled = false;
-            this.sendFileBtn.FlatAppearance.BorderSize = 0;
-            this.sendFileBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.sendFileBtn.Location = new System.Drawing.Point(276, 136);
-            this.sendFileBtn.Name = "sendFileBtn";
-            this.sendFileBtn.Size = new System.Drawing.Size(32, 32);
-            this.sendFileBtn.TabIndex = 12;
-            this.sendFileBtn.UseVisualStyleBackColor = false;
-            this.sendFileBtn.Click += new System.EventHandler(this.sendFileBtn_Click);
-            // 
-            // serialProg
-            // 
-            this.serialProg.Location = new System.Drawing.Point(12, 180);
-            this.serialProg.Maximum = 1000000;
-            this.serialProg.Name = "serialProg";
-            this.serialProg.Size = new System.Drawing.Size(296, 10);
-            this.serialProg.TabIndex = 13;
-            // 
-            // portLabel
-            // 
-            this.portLabel.AutoSize = true;
-            this.portLabel.ForeColor = System.Drawing.Color.Red;
-            this.portLabel.Location = new System.Drawing.Point(141, 86);
-            this.portLabel.Name = "portLabel";
-            this.portLabel.Size = new System.Drawing.Size(167, 24);
-            this.portLabel.TabIndex = 3;
-            this.portLabel.Text = "Port Status: Closed";
-            // 
-            // portSelect
-            // 
-            this.portSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.portSelect.FormattingEnabled = true;
-            this.portSelect.Location = new System.Drawing.Point(12, 30);
-            this.portSelect.Name = "portSelect";
-            this.portSelect.Size = new System.Drawing.Size(142, 32);
-            this.portSelect.TabIndex = 2;
-            this.portSelect.DropDown += new System.EventHandler(this.portSelect_DropDown);
-            // 
-            // baudSelect
-            // 
-            this.baudSelect.FormattingEnabled = true;
-            this.baudSelect.Items.AddRange(new object[] {
-            "1200",
-            "2400",
-            "4800",
-            "9600",
-            "14400",
-            "19200",
-            "38400",
-            "57600",
-            "115200",
-            "128000",
-            "230400",
-            "250000",
-            "500000",
-            "1000000",
-            "2000000"});
-            this.baudSelect.Location = new System.Drawing.Point(166, 30);
-            this.baudSelect.Name = "baudSelect";
-            this.baudSelect.Size = new System.Drawing.Size(142, 32);
-            this.baudSelect.TabIndex = 1;
-            this.baudSelect.Text = "9600";
-            this.baudSelect.SelectedIndexChanged += new System.EventHandler(this.baudSelect_SelectedIndexChanged);
-            // 
-            // serialBtn
-            // 
-            this.serialBtn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.serialBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.serialBtn.Location = new System.Drawing.Point(12, 74);
-            this.serialBtn.Name = "serialBtn";
-            this.serialBtn.Size = new System.Drawing.Size(110, 50);
-            this.serialBtn.TabIndex = 0;
-            this.serialBtn.Text = "Open Port";
-            this.serialBtn.UseVisualStyleBackColor = true;
-            this.serialBtn.Click += new System.EventHandler(this.serialBtn_Click);
-            // 
             // portOpenCloseWorker
             // 
             this.portOpenCloseWorker.WorkerReportsProgress = true;
             this.portOpenCloseWorker.WorkerSupportsCancellation = true;
             this.portOpenCloseWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.portOpenCloseWorker_DoWork);
             this.portOpenCloseWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.portOpenCloseWorker_RunWorkerCompleted);
-            // 
-            // fileBox
-            // 
-            this.fileBox.Controls.Add(this.fileText);
-            this.fileBox.Controls.Add(this.fileBtn);
-            this.fileBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.fileBox.Location = new System.Drawing.Point(36, 982);
-            this.fileBox.Name = "fileBox";
-            this.fileBox.Size = new System.Drawing.Size(320, 74);
-            this.fileBox.TabIndex = 4;
-            this.fileBox.TabStop = false;
-            this.fileBox.Text = "Log File Location";
-            // 
-            // fileText
-            // 
-            this.fileText.Location = new System.Drawing.Point(12, 30);
-            this.fileText.Multiline = false;
-            this.fileText.Name = "fileText";
-            this.fileText.ReadOnly = true;
-            this.fileText.Size = new System.Drawing.Size(252, 32);
-            this.fileText.TabIndex = 11;
-            this.fileText.Text = "GCSDocs\\";
-            // 
-            // fileBtn
-            // 
-            this.fileBtn.BackColor = System.Drawing.Color.Transparent;
-            this.fileBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("fileBtn.BackgroundImage")));
-            this.fileBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.fileBtn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.fileBtn.FlatAppearance.BorderSize = 0;
-            this.fileBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.fileBtn.Location = new System.Drawing.Point(276, 29);
-            this.fileBtn.Name = "fileBtn";
-            this.fileBtn.Size = new System.Drawing.Size(32, 32);
-            this.fileBtn.TabIndex = 10;
-            this.fileBtn.UseVisualStyleBackColor = false;
-            this.fileBtn.Click += new System.EventHandler(this.fileBtn_Click);
             // 
             // openFileDialog
             // 
@@ -575,20 +392,6 @@
             // 
             this.dataSimWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.dataSimWorker_DoWork);
             // 
-            // button2
-            // 
-            this.button2.BackColor = System.Drawing.Color.Transparent;
-            this.button2.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button2.BackgroundImage")));
-            this.button2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.button2.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.button2.FlatAppearance.BorderSize = 0;
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Location = new System.Drawing.Point(1808, 1030);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(50, 50);
-            this.button2.TabIndex = 13;
-            this.button2.UseVisualStyleBackColor = false;
-            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.noGPSLabel);
@@ -639,30 +442,293 @@
             this.map.TabIndex = 1;
             this.map.Zoom = 15D;
             // 
-            // menuStrip1
+            // loggerWorker
             // 
-            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-            this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1904, 24);
-            this.menuStrip1.TabIndex = 14;
-            this.menuStrip1.Text = "menuStrip1";
+            this.loggerWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.loggerWorker_DoWork);
+            // 
+            // toolStrip
+            // 
+            this.toolStrip.AutoSize = false;
+            this.toolStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.toolStrip.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.toolStrip.GripMargin = new System.Windows.Forms.Padding(0);
+            this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.portSelect,
+            this.baudSelect,
+            this.serialBtn,
+            this.serialText,
+            this.sendLineBtn,
+            this.endingSelect,
+            this.sendFileBtn,
+            this.serialProg,
+            this.exitBtn,
+            this.settingsItem,
+            this.toolStripSeparator2,
+            this.clearItem});
+            this.toolStrip.Location = new System.Drawing.Point(0, 991);
+            this.toolStrip.Name = "toolStrip";
+            this.toolStrip.Padding = new System.Windows.Forms.Padding(0);
+            this.toolStrip.Size = new System.Drawing.Size(1904, 50);
+            this.toolStrip.TabIndex = 16;
+            this.toolStrip.Text = "toolStrip1";
+            // 
+            // portSelect
+            // 
+            this.portSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.portSelect.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.portSelect.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.portSelect.Margin = new System.Windows.Forms.Padding(12, 0, 1, 0);
+            this.portSelect.Name = "portSelect";
+            this.portSelect.Size = new System.Drawing.Size(120, 50);
+            this.portSelect.ToolTipText = "COM Port";
+            this.portSelect.DropDown += new System.EventHandler(this.portSelect_DropDown);
+            // 
+            // baudSelect
+            // 
+            this.baudSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.baudSelect.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.baudSelect.Items.AddRange(new object[] {
+            "1200",
+            "2400",
+            "4800",
+            "9600",
+            "14400",
+            "19200",
+            "38400",
+            "57600",
+            "115200",
+            "128000",
+            "230400",
+            "250000",
+            "500000",
+            "1000000",
+            "2000000"});
+            this.baudSelect.Name = "baudSelect";
+            this.baudSelect.Size = new System.Drawing.Size(90, 50);
+            this.baudSelect.SelectedIndexChanged += new System.EventHandler(this.baudSelect_SelectedIndexChanged);
+            // 
+            // serialBtn
+            // 
+            this.serialBtn.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.serialBtn.ForeColor = System.Drawing.Color.Red;
+            this.serialBtn.Margin = new System.Windows.Forms.Padding(6);
+            this.serialBtn.Name = "serialBtn";
+            this.serialBtn.Size = new System.Drawing.Size(99, 38);
+            this.serialBtn.Text = "Open Port";
+            this.serialBtn.Click += new System.EventHandler(this.serialBtn_Click);
+            this.serialBtn.MouseLeave += new System.EventHandler(this.serialBtn_MouseLeave);
+            this.serialBtn.MouseMove += new System.Windows.Forms.MouseEventHandler(this.serialBtn_MouseMove);
+            // 
+            // serialText
+            // 
+            this.serialText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.serialText.Enabled = false;
+            this.serialText.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.serialText.Name = "serialText";
+            this.serialText.Size = new System.Drawing.Size(300, 50);
+            this.serialText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.serialText_KeyDown);
+            // 
+            // sendLineBtn
+            // 
+            this.sendLineBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.sendLineBtn.Enabled = false;
+            this.sendLineBtn.Image = ((System.Drawing.Image)(resources.GetObject("sendLineBtn.Image")));
+            this.sendLineBtn.Margin = new System.Windows.Forms.Padding(6);
+            this.sendLineBtn.Name = "sendLineBtn";
+            this.sendLineBtn.Size = new System.Drawing.Size(76, 38);
+            this.sendLineBtn.Text = "Write";
+            this.sendLineBtn.Click += new System.EventHandler(this.sendLineBtn_Click);
+            // 
+            // endingSelect
+            // 
+            this.endingSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.endingSelect.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.endingSelect.Items.AddRange(new object[] {
+            "No line ending",
+            "Newline",
+            "Carriage return",
+            "Both NL & CR"});
+            this.endingSelect.Name = "endingSelect";
+            this.endingSelect.Size = new System.Drawing.Size(121, 50);
+            // 
+            // sendFileBtn
+            // 
+            this.sendFileBtn.Enabled = false;
+            this.sendFileBtn.Image = ((System.Drawing.Image)(resources.GetObject("sendFileBtn.Image")));
+            this.sendFileBtn.Margin = new System.Windows.Forms.Padding(6);
+            this.sendFileBtn.Name = "sendFileBtn";
+            this.sendFileBtn.Size = new System.Drawing.Size(122, 38);
+            this.sendFileBtn.Text = "Transfer File";
+            this.sendFileBtn.Click += new System.EventHandler(this.sendFileBtn_Click);
+            // 
+            // serialProg
+            // 
+            this.serialProg.AutoSize = false;
+            this.serialProg.Maximum = 1000000;
+            this.serialProg.Name = "serialProg";
+            this.serialProg.Size = new System.Drawing.Size(100, 30);
+            // 
+            // exitBtn
+            // 
+            this.exitBtn.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.exitBtn.AutoSize = false;
+            this.exitBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.exitBtn.Image = ((System.Drawing.Image)(resources.GetObject("exitBtn.Image")));
+            this.exitBtn.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.exitBtn.Name = "exitBtn";
+            this.exitBtn.Padding = new System.Windows.Forms.Padding(0);
+            this.exitBtn.Size = new System.Drawing.Size(50, 50);
+            this.exitBtn.TextImageRelation = System.Windows.Forms.TextImageRelation.Overlay;
+            this.exitBtn.Click += new System.EventHandler(this.exitBtn_Click);
+            // 
+            // settingsItem
+            // 
+            this.settingsItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.settingsItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.docsItem,
+            this.logItem});
+            this.settingsItem.Name = "settingsItem";
+            this.settingsItem.Size = new System.Drawing.Size(78, 50);
+            this.settingsItem.Text = "Settings";
+            // 
+            // docsItem
+            // 
+            this.docsItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.docsNew,
+            this.docsCopy,
+            this.docsOpen});
+            this.docsItem.Name = "docsItem";
+            this.docsItem.Size = new System.Drawing.Size(184, 26);
+            this.docsItem.Text = "docsfolderpath";
+            this.docsItem.Click += new System.EventHandler(this.docsItem_Click);
+            // 
+            // docsNew
+            // 
+            this.docsNew.Name = "docsNew";
+            this.docsNew.Size = new System.Drawing.Size(238, 26);
+            this.docsNew.Text = "Select new folder";
+            this.docsNew.Click += new System.EventHandler(this.docsNew_Click);
+            // 
+            // docsCopy
+            // 
+            this.docsCopy.Name = "docsCopy";
+            this.docsCopy.Size = new System.Drawing.Size(238, 26);
+            this.docsCopy.Text = "Copy path to clipboard";
+            this.docsCopy.Click += new System.EventHandler(this.docsCopy_Click);
+            // 
+            // docsOpen
+            // 
+            this.docsOpen.Name = "docsOpen";
+            this.docsOpen.Size = new System.Drawing.Size(238, 26);
+            this.docsOpen.Text = "Open in explorer";
+            this.docsOpen.Click += new System.EventHandler(this.docsOpen_Click);
+            // 
+            // logItem
+            // 
+            this.logItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.logNew,
+            this.logPortOpen,
+            this.logCopy,
+            this.logOpen});
+            this.logItem.Name = "logItem";
+            this.logItem.Size = new System.Drawing.Size(184, 26);
+            this.logItem.Text = "logfilepath";
+            // 
+            // logNew
+            // 
+            this.logNew.Name = "logNew";
+            this.logNew.Size = new System.Drawing.Size(253, 26);
+            this.logNew.Text = "New log file...";
+            this.logNew.Click += new System.EventHandler(this.logNew_Click);
+            // 
+            // logPortOpen
+            // 
+            this.logPortOpen.Checked = true;
+            this.logPortOpen.CheckOnClick = true;
+            this.logPortOpen.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.logPortOpen.Name = "logPortOpen";
+            this.logPortOpen.Size = new System.Drawing.Size(253, 26);
+            this.logPortOpen.Text = "New file on port opening";
+            // 
+            // logCopy
+            // 
+            this.logCopy.Name = "logCopy";
+            this.logCopy.Size = new System.Drawing.Size(253, 26);
+            this.logCopy.Text = "Copy path to clipboard";
+            this.logCopy.Click += new System.EventHandler(this.logCopy_Click);
+            // 
+            // logOpen
+            // 
+            this.logOpen.Name = "logOpen";
+            this.logOpen.Size = new System.Drawing.Size(253, 26);
+            this.logOpen.Text = "Open file";
+            this.logOpen.Click += new System.EventHandler(this.logOpen_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 50);
+            // 
+            // clearItem
+            // 
+            this.clearItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.clearItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.clearAll,
+            this.toolStripSeparator1,
+            this.clearTreeview,
+            this.clearCharts,
+            this.clearGPS});
+            this.clearItem.Name = "clearItem";
+            this.clearItem.Size = new System.Drawing.Size(58, 50);
+            this.clearItem.Text = "Clear";
+            // 
+            // clearAll
+            // 
+            this.clearAll.Name = "clearAll";
+            this.clearAll.Size = new System.Drawing.Size(179, 26);
+            this.clearAll.Text = "Clear all";
+            this.clearAll.Click += new System.EventHandler(this.clearAll_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(176, 6);
+            // 
+            // clearTreeview
+            // 
+            this.clearTreeview.Name = "clearTreeview";
+            this.clearTreeview.Size = new System.Drawing.Size(179, 26);
+            this.clearTreeview.Text = "Clear treeview";
+            this.clearTreeview.Click += new System.EventHandler(this.clearTreeview_Click);
+            // 
+            // clearCharts
+            // 
+            this.clearCharts.Name = "clearCharts";
+            this.clearCharts.Size = new System.Drawing.Size(179, 26);
+            this.clearCharts.Text = "Clear charts";
+            this.clearCharts.Click += new System.EventHandler(this.clearCharts_Click);
+            // 
+            // clearGPS
+            // 
+            this.clearGPS.Name = "clearGPS";
+            this.clearGPS.Size = new System.Drawing.Size(179, 26);
+            this.clearGPS.Text = "Clear GPS";
+            this.clearGPS.Click += new System.EventHandler(this.clearGPS_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
             this.ClientSize = new System.Drawing.Size(1904, 1041);
+            this.Controls.Add(this.toolStrip);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.simBox);
-            this.Controls.Add(this.fileBox);
-            this.Controls.Add(this.serialBox);
             this.Controls.Add(this.graphicsBox);
-            this.Controls.Add(this.exitBtn);
             this.Controls.Add(this.cameraBox);
             this.Controls.Add(this.dataTableBox);
-            this.Controls.Add(this.menuStrip1);
-            this.MainMenuStrip = this.menuStrip1;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Form1";
             this.Text = "Ground Station Software";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -671,15 +737,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.camPicture)).EndInit();
             this.cameraBox.ResumeLayout(false);
             this.graphicsBox.ResumeLayout(false);
-            this.serialBox.ResumeLayout(false);
-            this.serialBox.PerformLayout();
-            this.fileBox.ResumeLayout(false);
             this.simBox.ResumeLayout(false);
             this.simBox.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.toolStrip.ResumeLayout(false);
+            this.toolStrip.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -693,25 +757,12 @@
         private System.Windows.Forms.Button playBtn;
         private System.Windows.Forms.Button recBtn;
         private System.Windows.Forms.Button ssBtn;
-        private System.Windows.Forms.Button exitBtn;
         private System.Windows.Forms.GroupBox graphicsBox;
         private System.Windows.Forms.TreeView treeView;
-        private System.Windows.Forms.GroupBox serialBox;
-        private System.Windows.Forms.ComboBox baudSelect;
-        private System.Windows.Forms.Button serialBtn;
-        private System.Windows.Forms.ComboBox portSelect;
         private System.ComponentModel.BackgroundWorker portOpenCloseWorker;
-        private System.Windows.Forms.Label portLabel;
-        private System.Windows.Forms.GroupBox fileBox;
-        private System.Windows.Forms.RichTextBox fileText;
-        private System.Windows.Forms.Button fileBtn;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.ComponentModel.BackgroundWorker fileSenderWorker;
-        private System.Windows.Forms.ProgressBar serialProg;
-        private System.Windows.Forms.Button sendFileBtn;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
-        private System.Windows.Forms.RichTextBox serialText;
-        private System.Windows.Forms.Button sendLineBtn;
         private System.Windows.Forms.GroupBox simBox;
         private System.Windows.Forms.ComboBox intervalSelect;
         private System.Windows.Forms.Button simBtn;
@@ -722,14 +773,39 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Label packetLabel;
-        private System.Windows.Forms.Button clearTreeBtn;
         private System.Windows.Forms.Label delayLabel;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel;
         private System.Windows.Forms.GroupBox groupBox1;
         private GMap.NET.WindowsForms.GMapControl map;
         private System.Windows.Forms.Label noGPSLabel;
-        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.ComponentModel.BackgroundWorker loggerWorker;
+        private System.Windows.Forms.ToolStrip toolStrip;
+        private System.Windows.Forms.ToolStripComboBox portSelect;
+        private System.Windows.Forms.ToolStripComboBox baudSelect;
+        private System.Windows.Forms.ToolStripMenuItem serialBtn;
+        private System.Windows.Forms.ToolStripTextBox serialText;
+        private System.Windows.Forms.ToolStripMenuItem sendLineBtn;
+        private System.Windows.Forms.ToolStripMenuItem sendFileBtn;
+        private System.Windows.Forms.ToolStripComboBox endingSelect;
+        private System.Windows.Forms.ToolStripMenuItem exitBtn;
+        private System.Windows.Forms.ToolStripMenuItem settingsItem;
+        private System.Windows.Forms.ToolStripProgressBar serialProg;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem clearItem;
+        private System.Windows.Forms.ToolStripMenuItem docsItem;
+        private System.Windows.Forms.ToolStripMenuItem docsNew;
+        private System.Windows.Forms.ToolStripMenuItem docsCopy;
+        private System.Windows.Forms.ToolStripMenuItem docsOpen;
+        private System.Windows.Forms.ToolStripMenuItem logItem;
+        private System.Windows.Forms.ToolStripMenuItem logNew;
+        private System.Windows.Forms.ToolStripMenuItem logPortOpen;
+        private System.Windows.Forms.ToolStripMenuItem logCopy;
+        private System.Windows.Forms.ToolStripMenuItem logOpen;
+        private System.Windows.Forms.ToolStripMenuItem clearAll;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem clearTreeview;
+        private System.Windows.Forms.ToolStripMenuItem clearCharts;
+        private System.Windows.Forms.ToolStripMenuItem clearGPS;
     }
 }
 
