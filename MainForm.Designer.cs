@@ -1,6 +1,8 @@
-﻿namespace groundstation
+﻿using System.Windows.Forms;
+
+namespace groundstation
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +31,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.serialPort = new System.IO.Ports.SerialPort(this.components);
             this.dataTableBox = new System.Windows.Forms.GroupBox();
             this.delayLabel = new System.Windows.Forms.Label();
@@ -65,7 +67,7 @@
             this.portSelect = new System.Windows.Forms.ToolStripComboBox();
             this.baudSelect = new System.Windows.Forms.ToolStripComboBox();
             this.serialBtn = new System.Windows.Forms.ToolStripMenuItem();
-            this.serialText = new System.Windows.Forms.ToolStripTextBox();
+            this.serialText = new System.Windows.Forms.ToolStripComboBox();
             this.sendLineBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.endingSelect = new System.Windows.Forms.ToolStripComboBox();
             this.sendFileBtn = new System.Windows.Forms.ToolStripMenuItem();
@@ -471,7 +473,7 @@
             this.toolStrip.Padding = new System.Windows.Forms.Padding(0);
             this.toolStrip.Size = new System.Drawing.Size(1904, 50);
             this.toolStrip.TabIndex = 16;
-            this.toolStrip.Text = "toolStrip1";
+            this.toolStrip.Text = "toolStrip";
             // 
             // portSelect
             // 
@@ -506,6 +508,7 @@
             "2000000"});
             this.baudSelect.Name = "baudSelect";
             this.baudSelect.Size = new System.Drawing.Size(90, 50);
+            this.baudSelect.Text = "9600";
             this.baudSelect.SelectedIndexChanged += new System.EventHandler(this.baudSelect_SelectedIndexChanged);
             // 
             // serialBtn
@@ -522,11 +525,12 @@
             // 
             // serialText
             // 
-            this.serialText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.serialText.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.serialText.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.serialText.Enabled = false;
-            this.serialText.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.serialText.Name = "serialText";
             this.serialText.Size = new System.Drawing.Size(300, 50);
+            this.serialText.Tag = "commandList";
             this.serialText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.serialText_KeyDown);
             // 
             // sendLineBtn
@@ -536,8 +540,8 @@
             this.sendLineBtn.Image = ((System.Drawing.Image)(resources.GetObject("sendLineBtn.Image")));
             this.sendLineBtn.Margin = new System.Windows.Forms.Padding(6);
             this.sendLineBtn.Name = "sendLineBtn";
-            this.sendLineBtn.Size = new System.Drawing.Size(76, 38);
-            this.sendLineBtn.Text = "Write";
+            this.sendLineBtn.Size = new System.Drawing.Size(73, 38);
+            this.sendLineBtn.Text = "Send";
             this.sendLineBtn.Click += new System.EventHandler(this.sendLineBtn_Click);
             // 
             // endingSelect
@@ -551,6 +555,7 @@
             "Both NL & CR"});
             this.endingSelect.Name = "endingSelect";
             this.endingSelect.Size = new System.Drawing.Size(121, 50);
+            this.endingSelect.Text = "Newline";
             // 
             // sendFileBtn
             // 
@@ -716,7 +721,7 @@
             this.clearGPS.Text = "Clear GPS";
             this.clearGPS.Click += new System.EventHandler(this.clearGPS_Click);
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -729,7 +734,7 @@
             this.Controls.Add(this.cameraBox);
             this.Controls.Add(this.dataTableBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "Ground Station Software";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.dataTableBox.ResumeLayout(false);
@@ -783,7 +788,6 @@
         private System.Windows.Forms.ToolStripComboBox portSelect;
         private System.Windows.Forms.ToolStripComboBox baudSelect;
         private System.Windows.Forms.ToolStripMenuItem serialBtn;
-        private System.Windows.Forms.ToolStripTextBox serialText;
         private System.Windows.Forms.ToolStripMenuItem sendLineBtn;
         private System.Windows.Forms.ToolStripMenuItem sendFileBtn;
         private System.Windows.Forms.ToolStripComboBox endingSelect;
@@ -806,6 +810,7 @@
         private System.Windows.Forms.ToolStripMenuItem clearTreeview;
         private System.Windows.Forms.ToolStripMenuItem clearCharts;
         private System.Windows.Forms.ToolStripMenuItem clearGPS;
+        private System.Windows.Forms.ToolStripComboBox serialText;
     }
 }
 
