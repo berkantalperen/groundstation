@@ -13,7 +13,7 @@ namespace groundstation
             map.DragButton = System.Windows.Forms.MouseButtons.Left;
             map.ShowCenter = false;
             map.MapProvider = GoogleSatelliteMapProvider.Instance;
-            map.CacheLocation = "map_cache";
+            map.CacheLocation = docsFilePath + "\\map_cache";
             map.Position = new PointLatLng(ort_pos[0], ort_pos[1]);
         }
         public void updateMarker(string markerId, double lat, double lon)

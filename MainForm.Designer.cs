@@ -37,8 +37,8 @@ namespace groundstation
             this.delayLabel = new System.Windows.Forms.Label();
             this.packetLabel = new System.Windows.Forms.Label();
             this.treeView = new System.Windows.Forms.TreeView();
-            this.camPicture = new System.Windows.Forms.PictureBox();
             this.cameraBox = new System.Windows.Forms.GroupBox();
+            this.camPicture = new AForge.Controls.PictureBox();
             this.recBtn = new System.Windows.Forms.Button();
             this.ssBtn = new System.Windows.Forms.Button();
             this.playBtn = new System.Windows.Forms.Button();
@@ -90,9 +90,10 @@ namespace groundstation
             this.clearTreeview = new System.Windows.Forms.ToolStripMenuItem();
             this.clearCharts = new System.Windows.Forms.ToolStripMenuItem();
             this.clearGPS = new System.Windows.Forms.ToolStripMenuItem();
+            this.recordWorker = new System.ComponentModel.BackgroundWorker();
             this.dataTableBox.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.camPicture)).BeginInit();
             this.cameraBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.camPicture)).BeginInit();
             this.graphicsBox.SuspendLayout();
             this.simBox.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -148,23 +149,14 @@ namespace groundstation
             this.treeView.Size = new System.Drawing.Size(296, 556);
             this.treeView.TabIndex = 0;
             // 
-            // camPicture
-            // 
-            this.camPicture.Location = new System.Drawing.Point(12, 30);
-            this.camPicture.Name = "camPicture";
-            this.camPicture.Size = new System.Drawing.Size(480, 270);
-            this.camPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.camPicture.TabIndex = 3;
-            this.camPicture.TabStop = false;
-            // 
             // cameraBox
             // 
+            this.cameraBox.Controls.Add(this.camPicture);
             this.cameraBox.Controls.Add(this.recBtn);
             this.cameraBox.Controls.Add(this.ssBtn);
             this.cameraBox.Controls.Add(this.playBtn);
             this.cameraBox.Controls.Add(this.camSelect);
             this.cameraBox.Controls.Add(this.pauseBtn);
-            this.cameraBox.Controls.Add(this.camPicture);
             this.cameraBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cameraBox.Location = new System.Drawing.Point(1380, 24);
             this.cameraBox.Name = "cameraBox";
@@ -173,12 +165,23 @@ namespace groundstation
             this.cameraBox.TabStop = false;
             this.cameraBox.Text = "Camera";
             // 
+            // camPicture
+            // 
+            this.camPicture.Image = null;
+            this.camPicture.Location = new System.Drawing.Point(12, 30);
+            this.camPicture.Name = "camPicture";
+            this.camPicture.Size = new System.Drawing.Size(480, 270);
+            this.camPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.camPicture.TabIndex = 0;
+            this.camPicture.TabStop = false;
+            // 
             // recBtn
             // 
             this.recBtn.BackColor = System.Drawing.Color.Transparent;
             this.recBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("recBtn.BackgroundImage")));
             this.recBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.recBtn.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.recBtn.Enabled = false;
             this.recBtn.FlatAppearance.BorderSize = 0;
             this.recBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.recBtn.Location = new System.Drawing.Point(432, 312);
@@ -194,6 +197,7 @@ namespace groundstation
             this.ssBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ssBtn.BackgroundImage")));
             this.ssBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ssBtn.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.ssBtn.Enabled = false;
             this.ssBtn.FlatAppearance.BorderSize = 0;
             this.ssBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ssBtn.Location = new System.Drawing.Point(388, 312);
@@ -236,6 +240,7 @@ namespace groundstation
             this.pauseBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pauseBtn.BackgroundImage")));
             this.pauseBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.pauseBtn.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.pauseBtn.Enabled = false;
             this.pauseBtn.FlatAppearance.BorderSize = 0;
             this.pauseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.pauseBtn.Location = new System.Drawing.Point(84, 312);
@@ -508,7 +513,6 @@ namespace groundstation
             "2000000"});
             this.baudSelect.Name = "baudSelect";
             this.baudSelect.Size = new System.Drawing.Size(90, 50);
-            this.baudSelect.Text = "9600";
             this.baudSelect.SelectedIndexChanged += new System.EventHandler(this.baudSelect_SelectedIndexChanged);
             // 
             // serialBtn
@@ -555,7 +559,6 @@ namespace groundstation
             "Both NL & CR"});
             this.endingSelect.Name = "endingSelect";
             this.endingSelect.Size = new System.Drawing.Size(121, 50);
-            this.endingSelect.Text = "Newline";
             // 
             // sendFileBtn
             // 
@@ -736,11 +739,11 @@ namespace groundstation
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "MainForm";
             this.Text = "Ground Station Software";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.dataTableBox.ResumeLayout(false);
             this.dataTableBox.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.camPicture)).EndInit();
             this.cameraBox.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.camPicture)).EndInit();
             this.graphicsBox.ResumeLayout(false);
             this.simBox.ResumeLayout(false);
             this.simBox.PerformLayout();
@@ -755,7 +758,6 @@ namespace groundstation
         #endregion
         private System.IO.Ports.SerialPort serialPort;
         private System.Windows.Forms.GroupBox dataTableBox;
-        private System.Windows.Forms.PictureBox camPicture;
         private System.Windows.Forms.GroupBox cameraBox;
         private System.Windows.Forms.Button pauseBtn;
         private System.Windows.Forms.ComboBox camSelect;
@@ -811,6 +813,8 @@ namespace groundstation
         private System.Windows.Forms.ToolStripMenuItem clearCharts;
         private System.Windows.Forms.ToolStripMenuItem clearGPS;
         private System.Windows.Forms.ToolStripComboBox serialText;
+        private System.ComponentModel.BackgroundWorker recordWorker;
+        private AForge.Controls.PictureBox camPicture;
     }
 }
 

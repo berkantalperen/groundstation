@@ -5,9 +5,11 @@ using System.IO;
 using System.IO.Ports;
 using CsvHelper;
 using System.Globalization;
+using Accord.Video.FFMPEG;
 
 namespace groundstation
 {
+    [System.ComponentModel.DesignerCategory("")]
     public partial class MainForm : Form
     {
         //PRE-DEFINED VARIABLES
@@ -39,13 +41,15 @@ namespace groundstation
                 Close();
             }
         }
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (videoSource != null && videoSource.IsRunning)
             {
                 videoSource.SignalToStop();
                 videoSource.WaitForStop();
             }
+            writer.Close();
+
         }
     }
 }

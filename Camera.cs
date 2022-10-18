@@ -3,6 +3,12 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using Accord.Video.FFMPEG;
+using System.ComponentModel;
+using System.Drawing.Imaging;
+using CsvHelper;
+using Accord.Math;
+using GMap.NET.MapProviders;
 
 namespace groundstation
 {
@@ -11,9 +17,45 @@ namespace groundstation
         //CAMERA
         FilterInfoCollection videoDevices;
         VideoCaptureDevice videoSource;
+        bool recording = false;
+        private DateTime? firstFrameTime;
+        VideoFileWriter writer = new VideoFileWriter();
+        int width = 1280;
+        int height = 720;
+
+        private void camPicture_NewFrame(object sender, ref Bitmap bmp)
+        {
+            if (recording)
+            {
+                // create new video file
+                // create a bitmap to save into the video file
+                // write 1000 video frames
+                if (firstFrameTime != null)
+                {
+                    writer.WriteVideoFrame(bmp, DateTime.Now - firstFrameTime.Value);
+                }
+                else
+                {
+                    writer.WriteVideoFrame(bmp);
+                    firstFrameTime = DateTime.Now;
+                }
+            }
+        }
         private void VideoSource_NewFrame(object sender, AForge.Video.NewFrameEventArgs eventArgs)
         {
             camPicture.Image = (Bitmap)eventArgs.Frame.Clone();
+            if (recording)
+            {
+                if (firstFrameTime != null)
+                {
+                    writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone(), DateTime.Now - firstFrameTime.Value);
+                }
+                else
+                {
+                    writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone());
+                    firstFrameTime = DateTime.Now;
+                }
+            }
         }
         private void playBtn_Click(object sender, EventArgs e)
         {
@@ -21,7 +63,6 @@ namespace groundstation
             {
                 foreach (FilterInfo device in videoDevices)
                 {
-
                     if (device.Name == camSelect.SelectedItem.ToString())
                     {
                         videoSource = new VideoCaptureDevice(device.MonikerString);
@@ -35,10 +76,16 @@ namespace groundstation
                 camSelect.Enabled = false;
                 playBtn.Enabled = false;
                 pauseBtn.Enabled = true;
+                ssBtn.Enabled = true;
+                recBtn.Enabled = true;
             }
-            catch (System.NullReferenceException)
+            catch (NullReferenceException)
             {
                 MessageBox.Show("Please select a capture device!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         private void pauseBtn_Click(object sender, EventArgs e)
@@ -46,13 +93,14 @@ namespace groundstation
             try
             {
                 videoSource.SignalToStop();
-                videoSource.WaitForStop();
                 camPicture.Image = null;
                 camSelect.Enabled = true;
                 playBtn.Enabled = true;
                 pauseBtn.Enabled = false;
+                ssBtn.Enabled = false;
+                recBtn.Enabled = false;
             }
-            catch (System.NullReferenceException)
+            catch (NullReferenceException)
             {
                 MessageBox.Show("Please select a capture device!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -70,15 +118,12 @@ namespace groundstation
         {
             try
             {
-                if (!Directory.Exists(docsFilePath + "\\Screenshots"))
+                if (!Directory.Exists(docsFilePath + "\\Captured"))
                 {
-                    Directory.CreateDirectory(docsFilePath + "\\Screenshots");
+                    Directory.CreateDirectory(docsFilePath + "\\Captured");
                 }
-                camPicture.Image.Save(docsFilePath + $"\\Screenshots\\{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.bmp", camPicture.Image.RawFormat);
-            }
-            catch (System.NullReferenceException)
-            {
-                MessageBox.Show("Please select a capture device!", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Bitmap bmp = (Bitmap)camPicture.Image;
+                bmp.Save(docsFilePath + $"\\Captured\\{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.bmp", bmp.RawFormat);
             }
             catch (Exception err)
             {
@@ -87,7 +132,15 @@ namespace groundstation
         }
         private void recBtn_Click(object sender, EventArgs e)
         {
-            updateMarker("adada", multiplyWithRandBtw(ort_pos[0], 0.9999, 1.0001), multiplyWithRandBtw(ort_pos[1], 0.9999, 1.0001));
+            if (!recording)
+            {
+                writer.Open(docsFilePath + $"\\Captured\\{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.avi", width, height);
+            }
+            else
+            {
+                writer.Close();
+            }
+            recording = !recording;
         }
     }
 }
