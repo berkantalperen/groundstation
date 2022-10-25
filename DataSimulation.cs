@@ -26,17 +26,17 @@ namespace groundstation
         }
         private void dataFromCSV(long time, string filepath)
         {
-            defaultDataset dataset = new defaultDataset();
-            dataset.T = time;
-            dataset.S = time < 10 ? "Launch" : time < 180 ? "Burnout" : time < 240 ? "Apogee" : time < 300 ? "First recovery" : time < 360 ? "Second Recovery" : "Landed";
-            //dataset.GPS.Longitude *= time / 10000;
-            //dataset.GPS.Latitude *= time / 10000;
-            //dataset.Tmp = multiplyWithRandBtw(dataset.Tmp, 0.9, 1.1);
-            using (var reader = new StreamReader(filepath))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
+            //defaultDataset dataset = new defaultDataset();
+            //dataset.T = time;
+            //dataset.S = time < 10 ? "Launch" : time < 180 ? "Burnout" : time < 240 ? "Apogee" : time < 300 ? "First recovery" : time < 360 ? "Second Recovery" : "Landed";
+            ////dataset.GPS.Longitude *= time / 10000;
+            ////dataset.GPS.Latitude *= time / 10000;
+            ////dataset.Tmp = multiplyWithRandBtw(dataset.Tmp, 0.9, 1.1);
+            //using (var reader = new StreamReader(filepath))
+            //using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            //{
 
-            }
+            //}
         }
         private double multiplyWithRandBtw(double variable, double minVal, double maxVal)
         {
@@ -46,7 +46,7 @@ namespace groundstation
         }
         private void simBtn_Click(object sender, EventArgs e)
         {
-            defaultDataset dataset = new defaultDataset();
+            //defaultDataset dataset = new defaultDataset();
             //BeginInvoke(new Action(() =>
             //{
             //    applyToUI(data);

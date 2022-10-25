@@ -23,38 +23,21 @@ namespace groundstation
         int width = 1280;
         int height = 720;
 
-        private void camPicture_NewFrame(object sender, ref Bitmap bmp)
-        {
-            if (recording)
-            {
-                // create new video file
-                // create a bitmap to save into the video file
-                // write 1000 video frames
-                if (firstFrameTime != null)
-                {
-                    writer.WriteVideoFrame(bmp, DateTime.Now - firstFrameTime.Value);
-                }
-                else
-                {
-                    writer.WriteVideoFrame(bmp);
-                    firstFrameTime = DateTime.Now;
-                }
-            }
-        }
         private void VideoSource_NewFrame(object sender, AForge.Video.NewFrameEventArgs eventArgs)
         {
             camPicture.Image = (Bitmap)eventArgs.Frame.Clone();
             if (recording)
             {
-                if (firstFrameTime != null)
-                {
-                    writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone(), DateTime.Now - firstFrameTime.Value);
-                }
-                else
-                {
-                    writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone());
-                    firstFrameTime = DateTime.Now;
-                }
+                //if (firstFrameTime != null)
+                //{
+                //    writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone(), DateTime.Now - firstFrameTime.Value);
+                //}
+                //else
+                //{
+                //    writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone());
+                //    firstFrameTime = DateTime.Now;
+                //}
+                writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone());
             }
         }
         private void playBtn_Click(object sender, EventArgs e)
@@ -118,10 +101,7 @@ namespace groundstation
         {
             try
             {
-                if (!Directory.Exists(docsFilePath + "\\Captured"))
-                {
-                    Directory.CreateDirectory(docsFilePath + "\\Captured");
-                }
+                checkDirectory();
                 Bitmap bmp = (Bitmap)camPicture.Image;
                 bmp.Save(docsFilePath + $"\\Captured\\{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.bmp", bmp.RawFormat);
             }
@@ -130,8 +110,16 @@ namespace groundstation
                 MessageBox.Show(err.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private void checkDirectory()
+        {
+            if (!Directory.Exists(docsFilePath + "\\Captured"))
+            {
+                Directory.CreateDirectory(docsFilePath + "\\Captured");
+            }
+        }
         private void recBtn_Click(object sender, EventArgs e)
         {
+            checkDirectory();
             if (!recording)
             {
                 writer.Open(docsFilePath + $"\\Captured\\{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.avi", width, height);

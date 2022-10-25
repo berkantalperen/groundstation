@@ -1,11 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.IO;
-using System.IO.Ports;
-using CsvHelper;
 using System.Globalization;
-using Accord.Video.FFMPEG;
+using System.Windows.Forms;
 
 namespace groundstation
 {
@@ -18,14 +13,15 @@ namespace groundstation
         public string[] commandList = { "command1", "command2" };
         public string simFilePath = "";
         double[] ort_pos = { 39.89009702352859, 32.77991689326698 };
-        public string comPropName = "C";
+        public string comPropName = "ComputerName";
         public string gpsPropName = "GPS";
-        public string timePropName = "T";
+        public string gpsLatPropName = "Latitude";
+        public string gpsLonPropName = "Longitude";
+        public string timePropName = "Time";
         
         public MainForm()
         {
             WindowState = FormWindowState.Maximized;
-            FormBorderStyle = FormBorderStyle.None;
             InitializeComponent();
             init_map();
             init_serial();

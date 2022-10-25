@@ -20,6 +20,8 @@ namespace groundstation
             serialText.Items.Clear();
             serialText.Items.AddRange(commandList);
             serialText.AutoCompleteCustomSource.AddRange(commandList);
+            baudSelect.SelectedIndex = 3;
+            endingSelect.SelectedIndex = 1;
         }
         private void serialBtn_Click(object sender, EventArgs e)
         {
@@ -85,7 +87,7 @@ namespace groundstation
                 sendLineBtn.Enabled = !sendLineBtn.Enabled;
                 sendFileBtn.Enabled = !sendFileBtn.Enabled;
                 serialText.Enabled = !serialText.Enabled;
-                serialBtn.ForeColor = serialPort.IsOpen ? Color.LimeGreen : Color.Red;
+                serialBtn.ForeColor = serialPort.IsOpen ? Color.Red : Color.LimeGreen;
                 if (serialPort.IsOpen && logPortOpen.CheckState == CheckState.Checked)
                 {
                     newLogFile();

@@ -256,7 +256,7 @@ namespace groundstation
             this.graphicsBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.graphicsBox.Location = new System.Drawing.Point(368, 24);
             this.graphicsBox.Name = "graphicsBox";
-            this.graphicsBox.Size = new System.Drawing.Size(1000, 598);
+            this.graphicsBox.Size = new System.Drawing.Size(1000, 952);
             this.graphicsBox.TabIndex = 10;
             this.graphicsBox.TabStop = false;
             this.graphicsBox.Text = "Graphics";
@@ -267,7 +267,7 @@ namespace groundstation
             this.flowLayoutPanel.Location = new System.Drawing.Point(12, 30);
             this.flowLayoutPanel.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel.Name = "flowLayoutPanel";
-            this.flowLayoutPanel.Size = new System.Drawing.Size(976, 556);
+            this.flowLayoutPanel.Size = new System.Drawing.Size(976, 912);
             this.flowLayoutPanel.TabIndex = 1;
             // 
             // portOpenCloseWorker
@@ -518,7 +518,7 @@ namespace groundstation
             // serialBtn
             // 
             this.serialBtn.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.serialBtn.ForeColor = System.Drawing.Color.Red;
+            this.serialBtn.ForeColor = System.Drawing.Color.Lime;
             this.serialBtn.Margin = new System.Windows.Forms.Padding(6);
             this.serialBtn.Name = "serialBtn";
             this.serialBtn.Size = new System.Drawing.Size(99, 38);

@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Reflection;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace groundstation
 {
@@ -16,6 +18,7 @@ namespace groundstation
         string incomingdata = string.Empty;
         Stopwatch packetWatch = new Stopwatch();
         long totaldelay = 0, avg = 0;
+
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             //Console.WriteLine($"datareceived at {DateTime.Now.Millisecond}");
@@ -32,7 +35,24 @@ namespace groundstation
                 {
                     try
                     {
-                        defaultDataset data = JsonSerializer.Deserialize<defaultDataset>(incomingdata);
+                        Console.WriteLine("++");
+                        var definition = new
+                        {
+                            ComputerName = string.Empty,
+                            Time = new long?(),
+                            Stage = string.Empty,
+                            Temperature = new long?(),
+                            Altitude = new double?(),
+                            Pressure = new int?(),
+                            Humidity = new int?(),
+                            GPS = new { Latitude = new double?(), Longitude = new double?() },
+                            Acceleration = new { X = new double?(), Y = new double?(), Z = new double?() },
+                            Gyro = new { X = new double?(), Y = new double?(), Z = new double?() },
+                            BatteryVoltage = new double?()
+                        };
+                        var data = JsonConvert.DeserializeAnonymousType(incomingdata, definition);
+                        Console.WriteLine(data);
+                        //defaultDataset data = JsonSerializer.Deserialize<defaultDataset>(incomingdata);
                         BeginInvoke(new Action(() =>
                         {
                             applyToUI(data);
@@ -68,14 +88,14 @@ namespace groundstation
         {
             if (data.GetType().GetProperty(gpsPropName) != null && data.GetType().GetProperty(gpsPropName).GetValue(data) != null)
             {
-                GPS pos = (GPS)data.GetType().GetProperty(gpsPropName).GetValue(data);
+                var pos = data.GetType().GetProperty(gpsPropName).GetValue(data);
                 if (data.GetType().GetProperty(comPropName) != null && data.GetType().GetProperty(comPropName).GetValue(data) != null)
                 {
-                    updateMarker((string)data.GetType().GetProperty(comPropName).GetValue(data), pos.Lat, pos.Lon);
+                    updateMarker((string)data.GetType().GetProperty(comPropName).GetValue(data), (double)pos.GetType().GetProperty(gpsLatPropName).GetValue(pos), (double)pos.GetType().GetProperty(gpsLonPropName).GetValue(pos));
                 }
                 else
                 {
-                    updateMarker("unknown", pos.Lat, pos.Lon);
+                    updateMarker("unknown", (double)pos.GetType().GetProperty(gpsLatPropName).GetValue(pos), (double)pos.GetType().GetProperty(gpsLonPropName).GetValue(pos));
                 }
                 noGPSLabel.Visible = false;
             }
@@ -225,7 +245,7 @@ namespace groundstation
         private bool IsDouble(string input)
         {
             return double.TryParse(input, out _);
-        }        
+        }
         //CLEAR UI ITEMS
         private void clearAll_Click(object sender, EventArgs e)
         {
