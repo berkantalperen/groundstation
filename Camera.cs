@@ -1,60 +1,45 @@
-﻿using AForge.Video.DirectShow;
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using Accord.Video.FFMPEG;
-using System.ComponentModel;
-using System.Drawing.Imaging;
-using CsvHelper;
-using Accord.Math;
-using GMap.NET.MapProviders;
+using AForge.Video.DirectShow;
 
 namespace groundstation
 {
-    partial class MainForm : Form
+    partial class MainForm 
     {
         //CAMERA
-        FilterInfoCollection videoDevices;
-        VideoCaptureDevice videoSource;
-        bool recording = false;
-        private DateTime? firstFrameTime;
-        VideoFileWriter writer = new VideoFileWriter();
-        int width = 1280;
-        int height = 720;
+        private FilterInfoCollection _videoDevices;
+        private VideoCaptureDevice _videoSource;
+        bool _recording = false;
+        private readonly VideoFileWriter _videoFileWriter = new VideoFileWriter();
+        private const int VideoWidth = 1280;
+        private const int VideoHeight = 720;
 
         private void VideoSource_NewFrame(object sender, AForge.Video.NewFrameEventArgs eventArgs)
         {
             camPicture.Image = (Bitmap)eventArgs.Frame.Clone();
-            if (recording)
+            if (_recording)
             {
-                //if (firstFrameTime != null)
-                //{
-                //    writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone(), DateTime.Now - firstFrameTime.Value);
-                //}
-                //else
-                //{
-                //    writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone());
-                //    firstFrameTime = DateTime.Now;
-                //}
-                writer.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone());
+                _videoFileWriter.WriteVideoFrame((Bitmap)eventArgs.Frame.Clone());
             }
         }
         private void playBtn_Click(object sender, EventArgs e)
         {
             try
             {
-                foreach (FilterInfo device in videoDevices)
+                foreach (FilterInfo device in _videoDevices)
                 {
                     if (device.Name == camSelect.SelectedItem.ToString())
                     {
-                        videoSource = new VideoCaptureDevice(device.MonikerString);
+                        _videoSource = new VideoCaptureDevice(device.MonikerString);
                     }
                 }
-                videoSource.NewFrame += VideoSource_NewFrame;
-                if (!videoSource.IsRunning)
+                _videoSource.NewFrame += VideoSource_NewFrame;
+                if (!_videoSource.IsRunning)
                 {
-                    videoSource.Start();
+                    _videoSource.Start();
                 }
                 camSelect.Enabled = false;
                 playBtn.Enabled = false;
@@ -75,7 +60,7 @@ namespace groundstation
         {
             try
             {
-                videoSource.SignalToStop();
+                _videoSource.SignalToStop();
                 camPicture.Image = null;
                 camSelect.Enabled = true;
                 playBtn.Enabled = true;
@@ -90,9 +75,9 @@ namespace groundstation
         }
         private void camSelect_DropDown(object sender, EventArgs e)
         {
-            videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            _videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             camSelect.Items.Clear();
-            foreach (FilterInfo device in videoDevices)
+            foreach (FilterInfo device in _videoDevices)
             {
                 camSelect.Items.Add(device.Name);
             }
@@ -101,34 +86,34 @@ namespace groundstation
         {
             try
             {
-                checkDirectory();
+                CheckDirectory();
                 Bitmap bmp = (Bitmap)camPicture.Image;
-                bmp.Save(docsFilePath + $"\\Captured\\{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.bmp", bmp.RawFormat);
+                bmp.Save(DocsFilePath + $"\\Captured\\{DateTime.Now:ddMMyyyy_HHmmss}.bmp", bmp.RawFormat);
             }
             catch (Exception err)
             {
                 MessageBox.Show(err.Message, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        private void checkDirectory()
+        private void CheckDirectory()
         {
-            if (!Directory.Exists(docsFilePath + "\\Captured"))
+            if (!Directory.Exists(DocsFilePath + "\\Captured"))
             {
-                Directory.CreateDirectory(docsFilePath + "\\Captured");
+                Directory.CreateDirectory(DocsFilePath + "\\Captured");
             }
         }
         private void recBtn_Click(object sender, EventArgs e)
         {
-            checkDirectory();
-            if (!recording)
+            CheckDirectory();
+            if (!_recording)
             {
-                writer.Open(docsFilePath + $"\\Captured\\{DateTime.Now.ToString("ddMMyyyy_HHmmss")}.avi", width, height);
+                _videoFileWriter.Open(DocsFilePath + $"\\Captured\\{DateTime.Now:ddMMyyyy_HHmmss}.avi", VideoWidth, VideoHeight);
             }
             else
             {
-                writer.Close();
+                _videoFileWriter.Close();
             }
-            recording = !recording;
+            _recording = !_recording;
         }
     }
 }

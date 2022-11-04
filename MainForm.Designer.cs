@@ -32,7 +32,7 @@ namespace groundstation
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.serialPort = new System.IO.Ports.SerialPort(this.components);
+            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.dataTableBox = new System.Windows.Forms.GroupBox();
             this.delayLabel = new System.Windows.Forms.Label();
             this.packetLabel = new System.Windows.Forms.Label();
@@ -74,6 +74,27 @@ namespace groundstation
             this.serialProg = new System.Windows.Forms.ToolStripProgressBar();
             this.exitBtn = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dataTransferItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.transferItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.portItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.baduItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem7 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem10 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem11 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem12 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem13 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem14 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem15 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.docsItem = new System.Windows.Forms.ToolStripMenuItem();
             this.docsNew = new System.Windows.Forms.ToolStripMenuItem();
             this.docsCopy = new System.Windows.Forms.ToolStripMenuItem();
@@ -91,6 +112,8 @@ namespace groundstation
             this.clearCharts = new System.Windows.Forms.ToolStripMenuItem();
             this.clearGPS = new System.Windows.Forms.ToolStripMenuItem();
             this.recordWorker = new System.ComponentModel.BackgroundWorker();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.serialPort2 = new System.IO.Ports.SerialPort(this.components);
             this.dataTableBox.SuspendLayout();
             this.cameraBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.camPicture)).BeginInit();
@@ -100,9 +123,9 @@ namespace groundstation
             this.toolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
-            // serialPort
+            // serialPort1
             // 
-            this.serialPort.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort_DataReceived);
+            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort_DataReceived);
             // 
             // dataTableBox
             // 
@@ -112,7 +135,7 @@ namespace groundstation
             this.dataTableBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataTableBox.Location = new System.Drawing.Point(36, 24);
             this.dataTableBox.Name = "dataTableBox";
-            this.dataTableBox.Size = new System.Drawing.Size(320, 598);
+            this.dataTableBox.Size = new System.Drawing.Size(320, 794);
             this.dataTableBox.TabIndex = 1;
             this.dataTableBox.TabStop = false;
             this.dataTableBox.Text = "Data Table";
@@ -122,7 +145,7 @@ namespace groundstation
             this.delayLabel.AutoSize = true;
             this.delayLabel.BackColor = System.Drawing.Color.White;
             this.delayLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.delayLabel.Location = new System.Drawing.Point(24, 564);
+            this.delayLabel.Location = new System.Drawing.Point(26, 758);
             this.delayLabel.Margin = new System.Windows.Forms.Padding(0);
             this.delayLabel.Name = "delayLabel";
             this.delayLabel.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -135,7 +158,7 @@ namespace groundstation
             this.packetLabel.AutoSize = true;
             this.packetLabel.BackColor = System.Drawing.Color.White;
             this.packetLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.packetLabel.Location = new System.Drawing.Point(24, 551);
+            this.packetLabel.Location = new System.Drawing.Point(26, 745);
             this.packetLabel.Name = "packetLabel";
             this.packetLabel.Size = new System.Drawing.Size(101, 13);
             this.packetLabel.TabIndex = 1;
@@ -144,9 +167,9 @@ namespace groundstation
             // treeView
             // 
             this.treeView.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.treeView.Location = new System.Drawing.Point(12, 30);
+            this.treeView.Location = new System.Drawing.Point(12, 21);
             this.treeView.Name = "treeView";
-            this.treeView.Size = new System.Drawing.Size(296, 556);
+            this.treeView.Size = new System.Drawing.Size(296, 767);
             this.treeView.TabIndex = 0;
             // 
             // cameraBox
@@ -592,13 +615,163 @@ namespace groundstation
             // 
             // settingsItem
             // 
-            this.settingsItem.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.settingsItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.dataTransferItem,
+            this.toolStripSeparator4,
             this.docsItem,
             this.logItem});
             this.settingsItem.Name = "settingsItem";
             this.settingsItem.Size = new System.Drawing.Size(78, 50);
             this.settingsItem.Text = "Settings";
+            // 
+            // dataTransferItem
+            // 
+            this.dataTransferItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.transferItem,
+            this.toolStripSeparator3,
+            this.portItem,
+            this.baduItem});
+            this.dataTransferItem.Name = "dataTransferItem";
+            this.dataTransferItem.Size = new System.Drawing.Size(222, 26);
+            this.dataTransferItem.Text = "Transfer Data (COM)";
+            // 
+            // transferItem
+            // 
+            this.transferItem.Name = "transferItem";
+            this.transferItem.Size = new System.Drawing.Size(201, 26);
+            this.transferItem.Text = "Start Transfer";
+            this.transferItem.Click += new System.EventHandler(this.transferItem_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(198, 6);
+            // 
+            // portItem
+            // 
+            this.portItem.Name = "portItem";
+            this.portItem.Size = new System.Drawing.Size(201, 26);
+            this.portItem.Text = "Port";
+            this.portItem.DropDownOpening += new System.EventHandler(this.portItem_DropDownOpening);
+            // 
+            // baduItem
+            // 
+            this.baduItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem2,
+            this.toolStripMenuItem3,
+            this.toolStripMenuItem4,
+            this.toolStripMenuItem5,
+            this.toolStripMenuItem1,
+            this.toolStripMenuItem6,
+            this.toolStripMenuItem7,
+            this.toolStripMenuItem8,
+            this.toolStripMenuItem9,
+            this.toolStripMenuItem10,
+            this.toolStripMenuItem11,
+            this.toolStripMenuItem12,
+            this.toolStripMenuItem13,
+            this.toolStripMenuItem14,
+            this.toolStripMenuItem15});
+            this.baduItem.Name = "baduItem";
+            this.baduItem.Size = new System.Drawing.Size(201, 26);
+            this.baduItem.Text = "Baudrate (19200)";
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem2.Text = "1200";
+            // 
+            // toolStripMenuItem3
+            // 
+            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem3.Text = "2400";
+            // 
+            // toolStripMenuItem4
+            // 
+            this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem4.Text = "4800";
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem5.Text = "9600";
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem1.Text = "14400";
+            // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Checked = true;
+            this.toolStripMenuItem6.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem6.Text = "19200";
+            // 
+            // toolStripMenuItem7
+            // 
+            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem7.Text = "38400";
+            // 
+            // toolStripMenuItem8
+            // 
+            this.toolStripMenuItem8.Name = "toolStripMenuItem8";
+            this.toolStripMenuItem8.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem8.Text = "57600";
+            // 
+            // toolStripMenuItem9
+            // 
+            this.toolStripMenuItem9.Name = "toolStripMenuItem9";
+            this.toolStripMenuItem9.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem9.Text = "115200";
+            // 
+            // toolStripMenuItem10
+            // 
+            this.toolStripMenuItem10.Name = "toolStripMenuItem10";
+            this.toolStripMenuItem10.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem10.Text = "128000";
+            // 
+            // toolStripMenuItem11
+            // 
+            this.toolStripMenuItem11.Name = "toolStripMenuItem11";
+            this.toolStripMenuItem11.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem11.Text = "230400";
+            // 
+            // toolStripMenuItem12
+            // 
+            this.toolStripMenuItem12.Name = "toolStripMenuItem12";
+            this.toolStripMenuItem12.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem12.Text = "250000";
+            // 
+            // toolStripMenuItem13
+            // 
+            this.toolStripMenuItem13.Name = "toolStripMenuItem13";
+            this.toolStripMenuItem13.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem13.Text = "500000";
+            // 
+            // toolStripMenuItem14
+            // 
+            this.toolStripMenuItem14.Name = "toolStripMenuItem14";
+            this.toolStripMenuItem14.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem14.Text = "1000000";
+            // 
+            // toolStripMenuItem15
+            // 
+            this.toolStripMenuItem15.Name = "toolStripMenuItem15";
+            this.toolStripMenuItem15.Size = new System.Drawing.Size(143, 26);
+            this.toolStripMenuItem15.Text = "2000000";
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(219, 6);
             // 
             // docsItem
             // 
@@ -607,7 +780,7 @@ namespace groundstation
             this.docsCopy,
             this.docsOpen});
             this.docsItem.Name = "docsItem";
-            this.docsItem.Size = new System.Drawing.Size(184, 26);
+            this.docsItem.Size = new System.Drawing.Size(222, 26);
             this.docsItem.Text = "docsfolderpath";
             this.docsItem.Click += new System.EventHandler(this.docsItem_Click);
             // 
@@ -640,7 +813,7 @@ namespace groundstation
             this.logCopy,
             this.logOpen});
             this.logItem.Name = "logItem";
-            this.logItem.Size = new System.Drawing.Size(184, 26);
+            this.logItem.Size = new System.Drawing.Size(222, 26);
             this.logItem.Text = "logfilepath";
             // 
             // logNew
@@ -708,7 +881,7 @@ namespace groundstation
             this.clearTreeview.Name = "clearTreeview";
             this.clearTreeview.Size = new System.Drawing.Size(179, 26);
             this.clearTreeview.Text = "Clear treeview";
-            this.clearTreeview.Click += new System.EventHandler(this.clearTreeview_Click);
+            this.clearTreeview.Click += new System.EventHandler(this.clearTreeView_Click);
             // 
             // clearCharts
             // 
@@ -723,6 +896,16 @@ namespace groundstation
             this.clearGPS.Size = new System.Drawing.Size(179, 26);
             this.clearGPS.Text = "Clear GPS";
             this.clearGPS.Click += new System.EventHandler(this.clearGPS_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Interval = 30;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // serialPort2
+            // 
+            this.serialPort2.BaudRate = 19200;
+            this.serialPort2.PortName = "undefined";
             // 
             // MainForm
             // 
@@ -756,7 +939,7 @@ namespace groundstation
         }
 
         #endregion
-        private System.IO.Ports.SerialPort serialPort;
+        private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.GroupBox dataTableBox;
         private System.Windows.Forms.GroupBox cameraBox;
         private System.Windows.Forms.Button pauseBtn;
@@ -815,6 +998,29 @@ namespace groundstation
         private System.Windows.Forms.ToolStripComboBox serialText;
         private System.ComponentModel.BackgroundWorker recordWorker;
         private AForge.Controls.PictureBox camPicture;
+        private Timer timer1;
+        private System.IO.Ports.SerialPort serialPort2;
+        private ToolStripMenuItem dataTransferItem;
+        private ToolStripMenuItem portItem;
+        private ToolStripMenuItem baduItem;
+        private ToolStripMenuItem toolStripMenuItem2;
+        private ToolStripMenuItem toolStripMenuItem3;
+        private ToolStripMenuItem toolStripMenuItem4;
+        private ToolStripMenuItem toolStripMenuItem5;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem toolStripMenuItem6;
+        private ToolStripMenuItem toolStripMenuItem7;
+        private ToolStripMenuItem toolStripMenuItem8;
+        private ToolStripMenuItem toolStripMenuItem9;
+        private ToolStripMenuItem toolStripMenuItem10;
+        private ToolStripMenuItem toolStripMenuItem11;
+        private ToolStripMenuItem toolStripMenuItem12;
+        private ToolStripMenuItem toolStripMenuItem13;
+        private ToolStripMenuItem toolStripMenuItem14;
+        private ToolStripMenuItem toolStripMenuItem15;
+        private ToolStripMenuItem transferItem;
+        private ToolStripSeparator toolStripSeparator3;
+        private ToolStripSeparator toolStripSeparator4;
     }
 }
 

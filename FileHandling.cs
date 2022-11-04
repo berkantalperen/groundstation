@@ -10,28 +10,28 @@ namespace groundstation
         //FILE SETTINGS
         private void init_file()
         {
-            if (!Directory.Exists(docsFilePath))
+            if (!Directory.Exists(DocsFilePath))
             {
-                Directory.CreateDirectory(docsFilePath);
+                Directory.CreateDirectory(DocsFilePath);
             }
-            docsItem.Text = $"Documents folder: \"{docsFilePath}\"";
-            newLogFile();
+            docsItem.Text = $"Documents folder: \"{DocsFilePath}\"";
+            NewLogFile();
         }
-        public string logFilePath()
+        public string LogFilePath()
         {
-            if (!Directory.Exists(docsFilePath + "\\Logs"))
+            if (!Directory.Exists(DocsFilePath + "\\Logs"))
             {
-                Directory.CreateDirectory(docsFilePath + "\\Logs");
+                Directory.CreateDirectory(DocsFilePath + "\\Logs");
             }
-            return $"{docsFilePath}\\Logs\\{logFileName}.csv";
+            return $"{DocsFilePath}\\Logs\\{LogFileName}.csv";
         }
         private void docsNew_Click(object sender, EventArgs e)
         {
             DialogResult result = folderBrowserDialog.ShowDialog();
             if (result == DialogResult.OK)
             {
-                docsFilePath = folderBrowserDialog.SelectedPath;
-                docsItem.Text = $"Documents folder: \"{docsFilePath}\"";
+                DocsFilePath = folderBrowserDialog.SelectedPath;
+                docsItem.Text = $"Documents folder: \"{DocsFilePath}\"";
             }
         }
         private void docsItem_Click(object sender, EventArgs e)
@@ -42,7 +42,7 @@ namespace groundstation
         {
             try
             {
-                Process.Start(docsFilePath);
+                Process.Start(DocsFilePath);
             }
             catch (Exception err)
             {
@@ -51,22 +51,22 @@ namespace groundstation
         }
         private void docsCopy_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(docsFilePath);
+            Clipboard.SetText(DocsFilePath);
         }
-        private void newLogFile()
+        private void NewLogFile()
         {
-            logFileName = DateTime.Now.ToString("ddMMyyyy_HHmmss");
-            logItem.Text = $"Log file name: \"{logFileName}.csv\"";
+            LogFileName = DateTime.Now.ToString("ddMMyyyy_HHmmss");
+            logItem.Text = $"Log file name: \"{LogFileName}.csv\"";
         }
         private void logNew_Click(object sender, EventArgs e)
         {
-            newLogFile();
+            NewLogFile();
         }
         private void logOpen_Click(object sender, EventArgs e)
         {
             try
             {
-                Process.Start(logFilePath());
+                Process.Start(LogFilePath());
             }
             catch (Exception err)
             {
@@ -75,7 +75,7 @@ namespace groundstation
         }
         private void logCopy_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(logFilePath());
+            Clipboard.SetText(LogFilePath());
         }
     }
 }

@@ -1,53 +1,51 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.Drawing;
-using CsvHelper;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using System.IO.Ports;
+using System.Text;
+using System.Windows.Forms;
+using CsvHelper;
 
 namespace groundstation
 {
     partial class MainForm
     {
-        public string[] availablePorts() { return SerialPort.GetPortNames().Length != 0 ? SerialPort.GetPortNames() : new[] { "No Ports Available!" }; }
+        public object[] AvailablePorts() { return SerialPort.GetPortNames().Length != 0 ? SerialPort.GetPortNames() : new[] { "No Ports Available!" }; }
         //SERIAL PORT CONTROL
         private void init_serial()
         {
             serialText.Items.Clear();
-            serialText.Items.AddRange(commandList);
-            serialText.AutoCompleteCustomSource.AddRange(commandList);
+            serialText.Items.AddRange(CommandList);
+            serialText.AutoCompleteCustomSource.AddRange((string[])CommandList);
             baudSelect.SelectedIndex = 3;
             endingSelect.SelectedIndex = 1;
         }
         private void serialBtn_Click(object sender, EventArgs e)
         {
-            if (serialPort.IsOpen)
+            if (serialPort1.IsOpen)
             {
                 if (fileSenderWorker.IsBusy)
                 {
-                    DialogResult result = MessageBox.Show("You are transferring a file! Do you want to cancel it and close the port?", "Error!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (result == DialogResult.Yes)
-                    {
-                        fileSenderWorker.CancelAsync();
-                        portOpenCloseWorker.RunWorkerAsync();
-                    }
+                    var result = MessageBox.Show("You are transferring a file! Do you want to cancel it and close the port?", "Error!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (result != DialogResult.Yes) return;
+                    fileSenderWorker.CancelAsync();
+                    portOpenCloseWorker.RunWorkerAsync(1);
                 }
                 else
                 {
-                    portOpenCloseWorker.RunWorkerAsync();
+                    portOpenCloseWorker.RunWorkerAsync(1);
                 }
             }
             else
             {
                 try
                 {
-                    serialPort.BaudRate = Convert.ToInt32(baudSelect.Text);
-                    serialPort.PortName = portSelect.Text;
-                    portOpenCloseWorker.RunWorkerAsync();
+                    serialPort1.BaudRate = Convert.ToInt32(baudSelect.Text);
+                    serialPort1.PortName = portSelect.Text;
+                    portOpenCloseWorker.RunWorkerAsync(1);
                 }
                 catch (Exception err)
                 {
@@ -58,39 +56,67 @@ namespace groundstation
         private void portSelect_DropDown(object sender, EventArgs e)
         {
             portSelect.Items.Clear();
-            portSelect.Items.AddRange(availablePorts());
+            portSelect.Items.AddRange(AvailablePorts());
         }
         private void baudSelect_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (serialPort.IsOpen)
+            if (serialPort1.IsOpen)
             {
-                serialPort.BaudRate = Convert.ToInt32(baudSelect.Text);
+                serialPort1.BaudRate = Convert.ToInt32(baudSelect.Text);
             }
         }
         private void portOpenCloseWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (serialPort.IsOpen)
+            e.Result = e.Argument;
+            switch (e.Argument)
             {
-                serialPort.Close();
-            }
-            else
-            {
-                serialPort.Open();
+                case 1:
+                    if (serialPort1.IsOpen)
+                    {
+                        serialPort1.Close();
+                    }
+                    else
+                    {
+                        serialPort1.Open();
+                    }
+                    break;
+                case 2:
+                    if (serialPort2.IsOpen)
+                    {
+                        serialPort2.Close();
+                        Console.WriteLine("close");
+                    }
+                    else
+                    {
+                        serialPort2.Open();
+                        Console.WriteLine("open");
+                    }
+                    break;
             }
         }
         private void portOpenCloseWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error == null)
             {
-                serialBtn.Text = serialBtn.Text == "Open Port" ? "Close Port" : "Open Port";
-                portSelect.Enabled = !portSelect.Enabled;
-                sendLineBtn.Enabled = !sendLineBtn.Enabled;
-                sendFileBtn.Enabled = !sendFileBtn.Enabled;
-                serialText.Enabled = !serialText.Enabled;
-                serialBtn.ForeColor = serialPort.IsOpen ? Color.Red : Color.LimeGreen;
-                if (serialPort.IsOpen && logPortOpen.CheckState == CheckState.Checked)
+                switch (e.Result)
                 {
-                    newLogFile();
+                    case 1:
+                        serialBtn.Text = serialBtn.Text == "Open Port" ? "Close Port" : "Open Port";
+                        portSelect.Enabled = !portSelect.Enabled;
+                        sendLineBtn.Enabled = !sendLineBtn.Enabled;
+                        sendFileBtn.Enabled = !sendFileBtn.Enabled;
+                        serialText.Enabled = !serialText.Enabled;
+                        serialBtn.ForeColor = serialPort1.IsOpen ? Color.Red : Color.LimeGreen;
+                        if (serialPort1.IsOpen && logPortOpen.CheckState == CheckState.Checked)
+                        {
+                            NewLogFile();
+                            
+                        }
+                        break;
+                    case 2:
+                        transferItem.Checked = !transferItem.Checked;
+                        Console.WriteLine("+");
+                        break;
                 }
             }
             else
@@ -146,37 +172,37 @@ namespace groundstation
                 }
             }
         }
-        System.Diagnostics.Stopwatch fileWatch = new System.Diagnostics.Stopwatch();
+        System.Diagnostics.Stopwatch _fileWatch = new System.Diagnostics.Stopwatch();
         private void fileSenderWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            fileWatch.Start();
-            long MAX_BUFFER = 1048576 / 4; //250KB
+            _fileWatch.Start();
+            long maxBuffer = 1048576 / 4; //250KB
             long totalBytesWritten = 0;
             using (FileStream fs = File.Open(e.Argument.ToString(), FileMode.Open, FileAccess.Read))
             {
                 bool endLoop = false;
                 while (true)
                 {
-                    if (fs.Length < MAX_BUFFER)
+                    if (fs.Length < maxBuffer)
                     {
-                        MAX_BUFFER = fs.Length;
+                        maxBuffer = fs.Length;
                         endLoop = true;
                     }
-                    else if (totalBytesWritten + MAX_BUFFER > fs.Length)
+                    else if (totalBytesWritten + maxBuffer > fs.Length)
                     {
-                        MAX_BUFFER = fs.Length - totalBytesWritten;
+                        maxBuffer = fs.Length - totalBytesWritten;
                         endLoop = true;
                     }
-                    byte[] buffer = new byte[MAX_BUFFER];
-                    fs.Read(buffer, 0, (int)MAX_BUFFER);
-                    serialPort.Write(buffer, 0, buffer.Length);
-                    while (serialPort.BytesToWrite != 0 && !fileSenderWorker.CancellationPending)
+                    byte[] buffer = new byte[maxBuffer];
+                    fs.Read(buffer, 0, (int)maxBuffer);
+                    serialPort1.Write(buffer, 0, buffer.Length);
+                    while (serialPort1.BytesToWrite != 0 && !fileSenderWorker.CancellationPending)
                     {
-                        long subTotal = totalBytesWritten + MAX_BUFFER - serialPort.BytesToWrite;
+                        long subTotal = totalBytesWritten + maxBuffer - serialPort1.BytesToWrite;
                         decimal progressPercentage = Decimal.Multiply(subTotal, 1000000) / fs.Length;
                         fileSenderWorker.ReportProgress((int)progressPercentage);
                     }
-                    totalBytesWritten += MAX_BUFFER;
+                    totalBytesWritten += maxBuffer;
                     if (endLoop)
                     {
                         break;
@@ -196,25 +222,25 @@ namespace groundstation
         }
         private void fileSenderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            fileWatch.Stop();
+            _fileWatch.Stop();
             DialogResult result;
             if (e.Cancelled)
             {
-                result = MessageBox.Show($"File transfer cancelled at {fileWatch.ElapsedMilliseconds}ms!");
+                result = MessageBox.Show($"File transfer cancelled at {_fileWatch.ElapsedMilliseconds}ms!");
             }
             else
             {
-                result = MessageBox.Show($"File transfer completed in {fileWatch.ElapsedMilliseconds}ms!");
+                result = MessageBox.Show($"File transfer completed in {_fileWatch.ElapsedMilliseconds}ms!");
             }
             if (result == DialogResult.OK)
             {
                 serialProg.Value = 0;
             }
-            fileWatch.Reset();
+            _fileWatch.Reset();
         }
         private void loggerWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            using (var writer = new StreamWriter(logFilePath(), true))
+            using (var writer = new StreamWriter(LogFilePath(), true))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 var records = new List<object>
@@ -229,10 +255,10 @@ namespace groundstation
             switch (endingSelect.SelectedIndex)
             {
                 case 0:
-                    serialPort.Write(Encoding.ASCII.GetBytes(serialText.Text), 0, Encoding.ASCII.GetBytes(serialText.Text).Length);
+                    serialPort1.Write(Encoding.ASCII.GetBytes(serialText.Text), 0, Encoding.ASCII.GetBytes(serialText.Text).Length);
                     break;
                 case 1:
-                    serialPort.WriteLine(serialText.Text);
+                    serialPort1.WriteLine(serialText.Text);
                     break;
                 case 2:
                     break;
@@ -240,6 +266,28 @@ namespace groundstation
                     break;
             }
             serialText.Text = "";
+        }
+        private void transferItem_Click(object sender, EventArgs e)
+        {
+            portOpenCloseWorker.RunWorkerAsync(2);
+        }
+        private void portItem_DropDownOpening(object sender, EventArgs e)
+        {
+            var arr = AvailablePorts();
+            portItem.DropDownItems.Clear();
+            foreach (var s in arr)
+            {
+                portItem.DropDownItems.Add((string)s);
+            }
+
+            foreach (ToolStripMenuItem item in portItem.DropDownItems)
+            {
+                item.Click += new EventHandler(portItem_Click);
+            }
+        }
+        private void portItem_Click(object sender, EventArgs e)
+        {
+            portItem.Text = $"Port ({sender})"; 
         }
     }
 }

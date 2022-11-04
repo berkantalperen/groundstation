@@ -1,8 +1,5 @@
-using CsvHelper;
-using System.ComponentModel;
-using System.Globalization;
-using System.IO;
 using System;
+using System.ComponentModel;
 
 namespace groundstation
 {
@@ -24,7 +21,7 @@ namespace groundstation
             //    Thread.Sleep(interval);
             //}
         }
-        private void dataFromCSV(long time, string filepath)
+        private void DataFromCsv(long time, string filepath)
         {
             //defaultDataset dataset = new defaultDataset();
             //dataset.T = time;
@@ -38,9 +35,9 @@ namespace groundstation
 
             //}
         }
-        private double multiplyWithRandBtw(double variable, double minVal, double maxVal)
+        private double MultiplyWithRandBtw(double variable, double minVal, double maxVal)
         {
-            Random rand = new Random();
+            var rand = new Random();
             variable *= rand.NextDouble() * (maxVal - minVal) + minVal;
             return variable;
         }

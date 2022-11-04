@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace groundstation.Properties
+namespace Ground_Station.Properties
 {
 
 
